@@ -1,0 +1,44 @@
+// PRINT STATEMENTS FOR DEBUG 
+// cout << "This is the init bigDaddy\n";
+// for (int l=0; l<10; l++){
+// 	cout << bigDaddy[l][0] << bigDaddy[l][1] << bigDaddy[l][2] << '\n';
+// }
+// this reads in a text file and allocates it to main memory 
+//cout << "Reading in textfile into main memory\n";
+
+// printing the cache
+//int fml =0;
+// cout << "This is the cache memory\n";
+// for (fml=0; fml<20; fml++){
+// 	cout << lilDaddy[fml][0] << lilDaddy[fml][1] << lilDaddy[fml][2] << "\n";
+// } 
+// cout << "end of cache\n";
+// showing the main memory with value of 9
+//int readI = 0;
+// cout << "This is the main memory\n";
+// for (readI=0; readI<10; readI++){
+// 	cout << "Tag: " <<bigDaddy[readI][0] << " Index: " << bigDaddy[readI][1] << " Value: " << bigDaddy[readI][2] << "\n";
+// }
+
+// DEBUG 
+//int lol = 0; 
+// cout << "CACHE AFTER FOUND VALUE\n";
+// for (lol=0; lol<236; lol++){
+// 	cout << lilDaddy[lol][0] << lilDaddy[lol][1] << lilDaddy[lol][2] << "\n";
+// } 
+// cout << "end of cache\n";
+//desiredAddress[2] = 3;
+//cout << cache_array->search(desiredAddress, 100) << '\n';
+
+//DEBUG
+
+	int fml=0;
+	cout << "this is fml: " << fml << "\n";
+	for (fml=230; fml<236; fml++){
+		cout << lilDaddy[fml][0] << lilDaddy[fml][1] << lilDaddy[fml][2] << "\n";
+	} 	
+	
+	cout << "Printing main memory after write\n";
+	for (fml=0; fml<10; fml++){
+		cout << bigDaddy[fml][0] << " " << bigDaddy[fml][1]  << " " << bigDaddy[fml][2] << "\n";
+	} 

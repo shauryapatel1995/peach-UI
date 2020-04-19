@@ -1,0 +1,7 @@
+001000001111000010000001000000000010000011101011
+Implementing the CMP instruction 
+CMP r1, r2
+Subtract R1 and R2 
+store in control register
+check control register first bit to see if it is 1. 
+if it is one that means that the cmp was greater. 

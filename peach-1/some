@@ -1,0 +1,32 @@
+
+// Set condition register statically for now
+int condition_register = 0;
+
+int condition_being_written = 0;
+
+// Variable to store the total cycles of a program
+int total_cycles = 0;
+Pipeline* pipeline = new Pipeline();
+int stored_fetch_result = -1;
+
+Instruction* stored_memory_instruction;
+
+int decode_instructions[1] = {-1};
+
+Instruction* noop = new Instruction();
+
+Instruction * execute_instructions[1] = {noop};
+Instruction * memory_access_instructions[1] = {noop};
+Instruction * write_back_instructions[1] = {noop};
+
+bool write_back_completed = false;
+int squash_instructions = 0;
+
+// Set to store the registers which will be written to in the future
+set<int> register_in_flight;
+
+// Map of register bank, initialize to zeros
+unordered_map<int, int> register_bank;
+
+// Flag to indicate data hazard. 
+int data_hazard = 0;
