@@ -2,18 +2,20 @@
 #include <string>
 #include <vector>
 #include "peach-1/mainMemory.h"
-#include "peach-1/pipeline-helper.h"
+#include "peach-1/pipeline-helper-new.h"
 
 extern int readMemory(int**, int);
-extern void run_pipeline(Cache*, int, int);
-extern int get_program_counter();
-extern Pipeline* get_pipeline();
+extern void run_pipeline(Cache*, int, int, Pipeline*);
+
+
+Pipeline* pipeline = nullptr;
 
 int **bigDaddy = nullptr;
 int **lilDaddy = nullptr;
 MainMemory * mainMem_array = nullptr;
 Cache * cache_array;
 
+std::string pipelineInfo = "";
 std::string show_cache_values() {
     std::basic_string<char> answer = "";
     std::basic_string<char> br  = "<br/>";
@@ -26,27 +28,37 @@ std::string show_cache_values() {
 }
 
 std::string getProg() {
-    return to_string(get_program_counter());
+    if (pipeline != nullptr)
+        return to_string(pipeline->program_counter);
+    else
+        return "0";
+    
+    
+}
+
+std::string get_total_pipeline_info() {
+    return pipelineInfo;
 }
 
 std::string get_pipeline_info() {
     std::string info = "";
     std::cout << "Getting pipeline info!" << std::endl;
-    Pipeline* pipeline = get_pipeline();
+    
     info += to_string(pipeline->decode_instruction);
     info += " ";
-    std::cout << "Got pipeline1" << std::endl;
-    int ins1 = (pipeline->execute_instruction != nullptr) ? pipeline->execute_instruction->instruction_type : 0;
+    
+    int ins1 = pipeline->execute_instruction->instruction_type;
     info += to_string(ins1);
-    std::cout << "Got pipeline2" << std::endl;
+    
     info += " ";
-    int ins2 = (pipeline->memory_access_instruction != nullptr ) ? pipeline->memory_access_instruction->instruction_type : 0;
+    int ins2 = pipeline->memory_access_instruction->instruction_type;
     info += to_string(ins2);
-    std::cout << "Got pipeline3" << std::endl;
+    
     info += " ";
-    int ins3 = (pipeline->write_back_instruction != nullptr) ? pipeline->write_back_instruction->instruction_type :0;
+    int ins3 =  pipeline->write_back_instruction->instruction_type;
     info += to_string(ins3);
-    std::cout << "Got pipeline4" << std::endl;
+    info += "<br/>";
+    
     return info;
 }
 
@@ -114,12 +126,28 @@ std::string runPipeline(int val) {
 }
 
 void run_pipeline_real(int cycles) {
+
+    if(pipeline == nullptr) {
+        pipeline = new Pipeline();
+        pipeline->cache = cache_array;
+        pipeline->continue_fetch = 1;
+        pipeline->continue_decode = 1;
+        pipeline->continue_execute = 1;
+        pipeline->continue_memory_access = 1;
+        pipeline->continue_write_back = 1;
+        Instruction* noop = new Instruction();
+        noop->isNoop = 1;
+        pipeline->execute_instructions[0] = noop;
+        pipeline->write_back_instructions[0] = noop;
+        pipeline->memory_access_instructions[0] = noop;
+    }
+
     std::cout << "Running pipeline! Cycles are: " << cycles << std::endl;
     
     int result = 0;
         // declaring the address we will be searching for in memory 
-        int desiredAddress[3]{0};
-     desiredAddress[0] = 8;
+    int desiredAddress[3]{0};
+    desiredAddress[0] = 8;
 	desiredAddress[1] = 242;
 	desiredAddress[2] = -1;
 	//printing the desired address
@@ -127,5 +155,12 @@ void run_pipeline_real(int cycles) {
     
     cache_array->search(desiredAddress, &result);
 	cout << "Result obtained was after searching: " << result << "\n";
-    run_pipeline(cache_array, 1024, cycles);
+    int count = 0;
+    while(count < cycles) {
+        run_pipeline(cache_array, 1024, 1, pipeline);
+        pipelineInfo += get_pipeline_info();
+        //std::cout << pipelineInfo;
+        count++;
+    }
+    
 }

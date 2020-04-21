@@ -684,16 +684,16 @@ int write_back() {
 }
 
 void run_pipeline(Cache* cache_array, int sizeCache, int cycles) {
-    pipeline->continue_fetch = 1;
-    pipeline->continue_decode = 1;
-    pipeline->continue_execute = 1;
-    pipeline->continue_memory_access = 1;
-    pipeline->continue_write_back = 1;
-    pipeline->cache = cache_array;
-    pipeline->cache_size = sizeCache;
-    pipeline->single_instruction = 0;
-    noop->isNoop = 1;
-    decode_instructions[0] = -1;
+    // pipeline->continue_fetch = 1;
+    // pipeline->continue_decode = 1;
+    // pipeline->continue_execute = 1;
+    // pipeline->continue_memory_access = 1;
+    // pipeline->continue_write_back = 1;
+    // pipeline->cache = cache_array;
+    // pipeline->cache_size = sizeCache;
+    // pipeline->single_instruction = 0;
+    // noop->isNoop = 1;
+    // decode_instructions[0] = -1;
     int cyclesComp = 0;
     // decode_instructions.push_back(-1);
 
@@ -709,7 +709,7 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycles) {
     //  write_back_instructions.push_back(noop);
     // write_back_instructions.push_back(noop);
 
-    register_bank.insert(pair<int, int>(5,0));
+    
     while(program_counter < 8450 && cyclesComp < cycles) {
 
         // Increment the current cycle 

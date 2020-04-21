@@ -9,7 +9,7 @@
 extern std::string runPipeline(int va11);
 extern void run_pipeline_real(int);
 extern std::string getProg();
-extern std::string get_pipeline_info();
+extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
 using namespace sciter;
 
@@ -63,7 +63,7 @@ public:
   }
 
   sciter::string getPipelineInfo() {
-       std::string ans = get_pipeline_info();
+       std::string ans = get_total_pipeline_info();
       using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
 		std::wstring_convert<convert_typeX , char16_t> converterX;
 		return converterX.from_bytes(ans);
