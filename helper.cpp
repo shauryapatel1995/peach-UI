@@ -44,20 +44,26 @@ std::string get_pipeline_info() {
     std::string info = "";
     std::cout << "Getting pipeline info!" << std::endl;
     
+    info += "<tr>";
+    info += "<td>";
     info += to_string(pipeline->decode_instruction);
-    info += " ";
+    info += "</td>";
     
+    info += "<td>";
     int ins1 = pipeline->execute_instruction->instruction_type;
     info += to_string(ins1);
-    
-    info += " ";
+    info += "</td>";
+
+    info += "<td>";
     int ins2 = pipeline->memory_access_instruction->instruction_type;
     info += to_string(ins2);
-    
-    info += " ";
+    info += "</td>";
+
+    info += "<td>";
     int ins3 =  pipeline->write_back_instruction->instruction_type;
     info += to_string(ins3);
-    info += "<br/>";
+    info += "</td>";
+    info += "</tr>";
     
     return info;
 }
@@ -102,7 +108,7 @@ std::string runPipeline(int val) {
 			}	
 		}
 	}
-     mainMem_array = new MainMemory(bigDaddy, nullptr, lilDaddy, 10, "main", sizeMain);
+     mainMem_array = new MainMemory(bigDaddy, nullptr, lilDaddy, 1, "main", sizeMain);
 	 cache_array = new Cache(lilDaddy,mainMem_array, bigDaddy, 1, "cache", sizeCache);
 
     

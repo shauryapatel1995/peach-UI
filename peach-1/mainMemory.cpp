@@ -44,14 +44,15 @@ int Memory::search(int address[], int* result){
 			//cout << "this is the index in memory: " << r << "\n";
 			*result = foundValue;
 			// return the cycles it took to run it
-			return mem_wait_time;	
+			cout << "What is the wait time? " << this->mem_wait_time << " ";
+			return this->mem_wait_time;	
 		} else {
 			// if(this->memId == "main")
 			// 	cout << "Search tag is: " << memmywemmy[r][0] << " search index is: " << memmywemmy[r][1] << "\n";
 		}
 	}
 	//TODO: -1 can also be a valid memory number right?
-	return -1;
+	return this->mem_wait_time;
 }
 
 // if not in cache replace
@@ -92,6 +93,7 @@ int Cache::search(int address[], int* result) {
 		int wait_time_next_level = next_level->search(address, result);
 		int value = *result;
 		Memory::replace(address, value, size);
+		cout << "Returning wait time as " << wait_time + wait_time_next_level;
 		return wait_time + wait_time_next_level;
 	} else {
 		return wait_time;

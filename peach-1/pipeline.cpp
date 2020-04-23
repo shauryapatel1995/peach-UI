@@ -3,12 +3,37 @@
 #include "mainMemory.h"
 #include <unordered_map>
 #include <vector>
-#include "pipeline-helper.h"
+#include "pipeline-helper-new.h"
 #include <deque>
 #include <set>
 
 using namespace std;
 
+void restart_fetch(Pipeline *pipeline)
+{
+    pipeline->continue_fetch = 1;
+}
+
+void restart_decode(Pipeline *pipeline)
+{
+    pipeline->continue_decode = 1;
+    if (pipeline->decode_wait_time == 0 && !pipeline->single_instruction)
+        restart_fetch(pipeline);
+}
+
+void restart_execute(Pipeline *pipeline)
+{
+    pipeline->continue_execute = 1;
+    if (pipeline->execute_wait_time == 0)
+        restart_decode(pipeline);
+}
+
+void restart_memory_access(Pipeline *pipeline)
+{
+    pipeline->continue_memory_access = 1;
+    if (pipeline->memory_access_wait_time == 0)
+        restart_execute(pipeline);
+}
 
 // Implement the sort
 // TODO: Create a Pipeline object that contains the stall and the instruction object for all stages.
@@ -227,7 +252,7 @@ void load_store_decode(Instruction *instruction, string binary_instruction, Pipe
 int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
     cout << "Fetch: ";
     pipeline->write_back_completed = false;
-    if(pipeline->fetch_wait_time != 0) {
+    if(pipeline->fetch_wait_time > 0) {
         cout << "Executing instruction " << pipeline->fetch_wait_time;
         pipeline->fetch_wait_time--; 
 
@@ -264,11 +289,11 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
         int next_instruction[3]{tag, index, 0};
         int result = 0;
         pipeline->fetch_wait_time = cache->search(next_instruction, &result);
-        
+        cout << "Pipeline fetch wait time is: " << pipeline->fetch_wait_time;
         cout << "Result of fetch stage is: " << result << " ";
         
         pipeline->fetch_wait_time--;
-
+        
         if(pipeline->fetch_wait_time != 0) {
             // Store the result for later use somehow. 
             pipeline->stored_fetch_result = result;
@@ -564,7 +589,7 @@ int write_back(Pipeline* pipeline) {
             // CMP instruction write to control register 
             pipeline->condition_register = write_back_instruction->result;
             cout << "Condition register is: " << pipeline->condition_register << "\n";
-            cout << "Writing to condition register: " << std::bitset<16>(condition_register).to_string() << " ";
+            cout << "Writing to condition register: " << std::bitset<16>(pipeline->condition_register).to_string() << " ";
 
             if(pipeline->condition_being_written) {
                 pipeline->condition_being_written = 0;
@@ -619,16 +644,16 @@ int write_back(Pipeline* pipeline) {
 }
 
 void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pipeline) {
-    pipeline->continue_fetch = 1;
-    pipeline->continue_decode = 1;
-    pipeline->continue_execute = 1;
-    pipeline->continue_memory_access = 1;
-    pipeline->continue_write_back = 1;
-    pipeline->cache = cache_array;
-    pipeline->cache_size = sizeCache;
-    pipeline->single_instruction = 0;
-    pipeline->noop->isNoop = 1;
-    pipeline->decode_instructions[0] = -1;
+    // pipeline->continue_fetch = 1;
+    // pipeline->continue_decode = 1;
+    // pipeline->continue_execute = 1;
+    // pipeline->continue_memory_access = 1;
+    // pipeline->continue_write_back = 1;
+    // pipeline->cache = cache_array;
+    // pipeline->cache_size = sizeCache;
+    // pipeline->single_instruction = 0;
+    // pipeline->noop->isNoop = 1;
+    // pipeline->decode_instructions[0] = -1;
     int cycles = 0;
     // decode_instructions.push_back(-1);
 
@@ -659,7 +684,7 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
             noop->isNoop = 1;
             pipeline->write_back_instructions[0] = noop;
         }
-
+        
         write_back(pipeline);
 
         if (pipeline->continue_memory_access && pipeline->memory_access_wait_time == 0)
