@@ -740,9 +740,12 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         decode(pipeline);
 
         
-        if(pipeline->program_counter < 8448 || !(pipeline->squash_instructions == 1))
+        if((pipeline->program_counter < 8448 && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0)
             fetch(cache_array, sizeCache, pipeline);
-
+        else {
+            cout << "Fetch temporarily stopping!";
+            cout << "Pipeline squash is?: " << pipeline->squash_instructions;
+        }
         // Here update the pipeline object with the instruction for the next cycle. 
         // We will keep a buffer for each 1 and use the buffer to decide the next object.
 
