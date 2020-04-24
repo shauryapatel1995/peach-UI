@@ -1,0 +1,6 @@
+# have to install GTK 3
+sudo apt-get install libgtk-3-dev
+# clone the sciter-sdk repo in the peach-UI folder
+# website https://github.com/c-smile/sciter-sdk
+git clone https://github.com/c-smile/sciter-sdk.git
+
