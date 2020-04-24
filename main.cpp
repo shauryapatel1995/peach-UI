@@ -11,6 +11,7 @@ extern void run_pipeline_real(int);
 extern std::string getProg();
 extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
+extern std::string show_register_bank_values();
 using namespace sciter;
 
 class frame: public sciter::window, sciter::event_handler {
@@ -26,6 +27,7 @@ public:
     FUNCTION_1("runPipelineUI", runPipelineUI);
     FUNCTION_0("getPc", getPc);
     FUNCTION_0("getPipelineInfo", getPipelineInfo);
+    FUNCTION_0("getRegs", getRegs);
   END_FUNCTION_MAP
   // function expsed to script:
   sciter::string  nativeMessage() { return WSTR("Hello C++ World"); }
@@ -56,10 +58,17 @@ public:
   } 
   sciter::string getPc() {
       std::cout << "Searching for Prog counter" << std::endl;
-      std::string ans = getProg();
+      std::string ans = show_register_bank_values();
       using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
 		std::wstring_convert<convert_typeX , char16_t> converterX;
 		return converterX.from_bytes(ans);
+  }
+
+  sciter::string getRegs() {
+    std::string ans = getProg();
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::wstring_convert<convert_typeX, char16_t> converterX;
+    return converterX.from_bytes(ans);
   }
 
   sciter::string getPipelineInfo() {

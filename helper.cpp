@@ -27,6 +27,20 @@ std::string show_cache_values() {
     return answer;
 }
 
+std::string show_register_bank_values() {
+    std::string info = "";
+    if(pipeline != nullptr) {
+        
+    for(auto reg: pipeline->register_bank) {
+        info += std::to_string(reg.first);
+        info += " : ";
+        info += std::to_string(reg.second);
+        info += "<br/>";
+    }
+    }
+    return info;
+}
+
 std::string getProg() {
     if (pipeline != nullptr)
         return to_string(pipeline->program_counter);
@@ -37,7 +51,9 @@ std::string getProg() {
 }
 
 std::string get_total_pipeline_info() {
-    return pipelineInfo;
+    std::string ans = pipelineInfo;
+    pipelineInfo = "";
+    return ans;
 }
 
 std::string get_pipeline_info() {
@@ -108,7 +124,7 @@ std::string runPipeline(int val) {
 			}	
 		}
 	}
-     mainMem_array = new MainMemory(bigDaddy, nullptr, lilDaddy, 1, "main", sizeMain);
+     mainMem_array = new MainMemory(bigDaddy, nullptr, lilDaddy, 10, "main", sizeMain);
 	 cache_array = new Cache(lilDaddy,mainMem_array, bigDaddy, 1, "cache", sizeCache);
 
     

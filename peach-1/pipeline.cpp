@@ -108,6 +108,7 @@ void branch_decode(Instruction* instruction, string binary_instruction, Pipeline
 
             // Reg that contains where to go
             instruction->operands.push_back(pipeline->register_bank.at(reg));
+            instruction->operands.push_back(pipeline->program_counter);
             instruction->condition_bits = stoi(binary_instruction.substr(6, 4), nullptr, 2);
         } else {
             cout << "Immediate jump value is: " << stoi(binary_instruction.substr(16, 16), nullptr, 2);
@@ -117,6 +118,7 @@ void branch_decode(Instruction* instruction, string binary_instruction, Pipeline
                 string result_str = bitset<16>(result).flip().to_string();
                 newPC = -(stoi(result_str, nullptr, 2) + 1);
                 instruction->operands.push_back(newPC);
+                instruction->operands.push_back(pipeline->program_counter);
                 instruction->condition_bits = stoi(binary_instruction.substr(6, 4), nullptr, 2);
                 
             }
@@ -124,6 +126,7 @@ void branch_decode(Instruction* instruction, string binary_instruction, Pipeline
             {
                 newPC = stoi(binary_instruction.substr(16, 16), nullptr, 2);
                 instruction->operands.push_back(newPC);
+                instruction->operands.push_back(pipeline->program_counter);
                 instruction->condition_bits = stoi(binary_instruction.substr(6, 4), nullptr, 2);
             }
         }
@@ -259,13 +262,18 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
         // Means NOOP
         if(pipeline->fetch_wait_time == 0) {
             // Push the stored value in this
-            pipeline->decode_instructions[0] = pipeline->stored_fetch_result;
-            cout << "Putting to decode! " << pipeline->stored_fetch_result << " ";
-            pipeline->program_counter++;
+            if(!pipeline->squash_instructions) {
+
+                pipeline->decode_instructions[0] = pipeline->stored_fetch_result;
+                cout << "Putting to decode! " << pipeline->stored_fetch_result << " ";
+                pipeline->program_counter++;
+            } else {
+                cout << "\nSQUASH COMPLETED!\n";
+                pipeline->squash_instructions = 0;
+            }
         } else {
             if (pipeline->continue_decode) {
                 pipeline->decode_instructions[0] = -1;
-                cout << "Putting NOOP! HAHA ";
             }
                 
         }
@@ -341,11 +349,8 @@ int decode(Pipeline* pipeline) {
 
         int decode_instruction = pipeline->decode_instruction;
         
-        if (decode_instruction == -1) {
+        if (decode_instruction == -1 || pipeline->squash_instructions) {
             cout << "NOOP! ";
-            Instruction* noop = new Instruction();
-            noop->isNoop = 1;
-            pipeline->execute_instructions[0] = noop;
             return 0;
         }
         
@@ -399,11 +404,14 @@ int execute(Pipeline* pipeline){
         
         // ALU
         Instruction *execute_instruction = pipeline->execute_instruction;
-        if (execute_instruction->isNoop) {
+        if (execute_instruction->isNoop || pipeline->squash_instructions)
+        {
             cout << "NOOP ";
+            execute_instruction->isNoop = 1;
             pipeline->memory_access_instructions[0] = execute_instruction;
             return 0;
         }
+
 
         cout << "Executing instruction: " << execute_instruction->instruction_type << std::endl;
             if (execute_instruction->instruction_type == 0)
@@ -427,7 +435,8 @@ int execute(Pipeline* pipeline){
                     string condition_string = bitset<16>(pipeline->condition_register).to_string();
                     if(condition_string.at(0) == '1') {
                         // CMP was less than 
-                        pipeline->program_counter += execute_instruction->operands.at(0);
+                        execute_instruction->result = execute_instruction->operands.at(1) + execute_instruction->operands.at(0);
+                        std::cout << "\nSQUASHING PIPELINE INSTRUCTIONS!\n";
                         pipeline->squash_instructions = 1;
                         cout << "Program counter now is: " << pipeline->program_counter;
                     }
@@ -436,7 +445,7 @@ int execute(Pipeline* pipeline){
                     if(pipeline->condition_register == 0) {
                         cout << "BRANCHING!";
                         cout << "Check equality is correct! ";
-                        pipeline->program_counter += execute_instruction->operands.at(0);
+                        execute_instruction->result = execute_instruction->operands.at(1) + execute_instruction->operands.at(0);
                         pipeline->squash_instructions = 1;
                         cout << "Program counter now is: " << pipeline->program_counter;
                     }
@@ -605,6 +614,14 @@ int write_back(Pipeline* pipeline) {
                 pipeline->register_bank[write_back_instruction->write_back_register] = write_back_instruction->result;
             else
                 pipeline->register_bank.insert(pair<int, int>(write_back_instruction->write_back_register, write_back_instruction->result));
+        } else if(write_back_instruction->instruction_type == 4 && pipeline->squash_instructions == 1) {
+            pipeline->program_counter = write_back_instruction->result;
+            cout << "Program counter now is: " << pipeline->program_counter;
+            if(pipeline->fetch_wait_time == 0) {
+                cout << "\nSQUASH COMPLETED!\n";
+                pipeline->squash_instructions = 0;
+            }
+                
         }
         // Check the register bank now
         cout << "Value of register at: " << write_back_instruction->write_back_register << " is: " << pipeline->register_bank.at(write_back_instruction->write_back_register) << "\n";
@@ -635,7 +652,9 @@ int write_back(Pipeline* pipeline) {
         cout << "Removing from pipeline " << write_back_instruction->write_back_register << "\n";
         pipeline->register_in_flight.erase(write_back_instruction->write_back_register);
         cout << "Data hazard set? " << pipeline->data_hazard << "\n";
-        if(pipeline->data_hazard == 1)
+
+        // When should I do this? What is memory is working then we can't restart it. 
+        if(pipeline->data_hazard == 1 && pipeline->continue_memory_access == 1 && pipeline->continue_execute == 1)
             restart_decode(pipeline);
     } else {
         cout << "Stalled\n";
@@ -714,13 +733,14 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         if (pipeline->continue_decode && pipeline->decode_wait_time == 0 && !pipeline->data_hazard)
         {
             pipeline->decode_instruction = pipeline->decode_instructions[0];
+            std::cout << "Decode instruction is: " << pipeline->decode_instruction;
             pipeline->decode_instructions[0] = -1;
         }
 
         decode(pipeline);
 
         
-        if(pipeline->program_counter < 8448)
+        if(pipeline->program_counter < 8448 || !(pipeline->squash_instructions == 1))
             fetch(cache_array, sizeCache, pipeline);
 
         // Here update the pipeline object with the instruction for the next cycle. 
