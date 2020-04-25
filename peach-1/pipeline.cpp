@@ -144,6 +144,10 @@ void alu_decode(Instruction *instruction, string binary_instruction, Pipeline* p
     instruction->opcode = stoi(binary_instruction.substr(3, 4), nullptr, 2);
     instruction->addressing_mode = stoi(binary_instruction.substr(7, 1), nullptr, 2);
     instruction->immediate = stoi(binary_instruction.substr(8, 1), nullptr, 2);
+    if (instruction->opcode == 2)
+    {
+        cout << "\n\n -- THIS IS THE MUL OPCODE --- \n\n";
+    }
 
     // opcode == 13 means CMP
     if(instruction->opcode == 13)
