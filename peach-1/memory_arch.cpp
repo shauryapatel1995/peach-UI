@@ -23,7 +23,7 @@ int readMemory (int **bigDaddy, int size) {
 		int tag = stoi(tagStr, nullptr, 2);
 		int index = stoi(indexStr, nullptr, 2);
 		long value = stol(valueStr, nullptr, 2);
-		//std::cout << "\n this is my tag: " << tag << ", this is my index: " << index << ", this is my value: " << value << "\n";
+		std::cout << "\n this is my tag: " << tag << ", this is my index: " << index << ", this is my value: " << value << "\n";
 		if (iter < size) {
 			bigDaddy[iter][0] = tag; 
 			bigDaddy[iter][1] = index;

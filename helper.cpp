@@ -101,7 +101,8 @@ std::string runPipeline(int val) {
         }
         std::cout << "Initializing memory!";
         // initializing main memory with the text file 
-        std::cout << readMemory(bigDaddy, sizeMain) << " Answer!";
+        readMemory(bigDaddy, sizeMain);
+        std::cout << (bigDaddy, sizeMain) << " Answer!";
         
         std::basic_string<char> br  = "<br/>";
         for(int i = 0; i <= 10; i++)
