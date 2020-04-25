@@ -705,7 +705,7 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
     // write_back_instructions.push_back(noop);
 
     pipeline->register_bank.insert(pair<int, int>(5,0));
-    while(pipeline->program_counter < 8450 && cycleCount > cycles) {
+    while(pipeline->program_counter < 8478 && cycleCount > cycles) {
         std::cout << "Program counter is: " << pipeline->program_counter;
         // Increment the current cycle 
         pipeline->total_cycles++;
@@ -760,7 +760,7 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         decode(pipeline);
 
         
-        if((pipeline->program_counter < 8448 && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0)
+        if((pipeline->program_counter < 8476 && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0)
             fetch(cache_array, sizeCache, pipeline);
         else {
             cout << "Fetch temporarily stopping!";
