@@ -4,46 +4,68 @@
         <style></style>
         
     </head>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
+        integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
     <style>
+        
+        .button-secondary {
+            background: rgb(66, 184, 221); /* this is a light blue */
+        }
         table{
         overflow-y:scroll; 
         height:400px; 
         margin-top:10px;
-        width: 500px;
+        width: 450px;
         }
     #parent_div_1{
-    width:45%;
+    width:70%;
     height: 100%;
     
     margin-right:10px;
-    float:left;
+    float:right;
 } #parent_div_2 {
+    width:25%;
+    height: 100%;
+    margin-right:10px;
+    float:left;
+}
+#parent_div_3 {
     width:45%;
     height: 100%;
     margin-right:10px;
     float:right;
 }
 .child_div_1{
+    width:50%;
+    float:left;
+    margin-top: 10px;
+    margin-right:5px;
+}
+.child_div_2{
     float:left;
     margin-top: 10px;
     margin-right:5px;
 }
     </style>
-    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
-        integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+    
         
     <body>
         
-        <button type="button" id="btn" class="pure-button"> Read Memory!</button>
-        <button type="button" id="pipe" class="pure-button"> Run Pipeline!</button>
+        <button type="button" id="btn" class="pure-button pure-button-active button-secondary"> Read Memory!</button>
+        <button type="button" id="pipe" class="pure-button pure-button-active button-secondary"> Run Pipeline!</button>
         <input id="numCycles" type="integer">
         Enter number of cycles
         </textarea>
         <p id="PC">Program Counter:</p>
+        <div id="parent_div_2">
+        
+        <div class="child_div_1">
+            Program text will go here
+        </div>
+        </div>
         <div id="parent_div_1">
-        
-        
-        
+        <div id="parent_div_3">
+
         <div class="child_div_1">
             <table id="memory" class="pure-table"><thead>
                 <tr>
@@ -64,8 +86,8 @@
             </table>
         </div>
     </div>
-        <div id="parent_div_2">
-        <div class="child_div_1">
+        <div id="parent_div_3">
+        <div class="child_div_2">
             <table id="regs" class="pure-table">
                 <thead>
                     <tr>
@@ -89,7 +111,7 @@
             </table>
         </div>
         </div>
-        
+        </div>
 
         <script type="text/tiscript">
              
