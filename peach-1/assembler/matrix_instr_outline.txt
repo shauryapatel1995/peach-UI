@@ -1,0 +1,107 @@
+# things that we need to load:
+	# size of the first loop
+	# size of the second loop
+	# size of the third loop  
+	# start of the first value of the second matrix
+
+# things that we need to save 	
+	# memory of the store location
+	# running sum 
+	# running counters for each loop 
+
+EXAMPLE: 2x3 * 3x5 = 2x5
+loop 1 = 2 = [0,1]
+loop 2 = 5 = [0,1,2,3,4]
+loop 3 = 3 = [0,1,2]
+
+#####################################################
+# first store off the size of the result matrix 
+LDD R0 0 # this is the row of the first matrix
+LDD R1 3 # this is the col of the second matrix
+
+# plan to split data memory into 2: input and outputg++
+# get the first output address
+LDD R14 512 # this is the first output address 
+STR R0 R14 # store the size of the result matrix row 
+ADD R14 1 # this is the next output address 
+STR R1 R14 # store the size of the result matrix col
+
+#####################################################
+# now we can write over the R0 and R1 
+# need to save R14 as the store memory
+# LDD R0 0 # this is the size of the first counter : for ex = 1
+# LDD R1 3 # this is the size of the second loop : for ex = 4 
+LDD R2 1 # this is the size of the third loop : for ex =2
+
+# value is zero is at memory 6
+LDD R15 6 
+
+# now we need to set up the counters 
+LDD R3 R15 # start first counter for the first loop at zero R15=0
+LDD R4 R15 # start second counter at zero
+LDD R5 R15 # start the third counter at zero
+
+# start point of the second matrix
+LDD R13 5 # need to save this memory address of start of second matrix 
+LDD R6 R13 # the value of the start memory  
+ADD R13 1 
+
+# start point of the first matrix 
+LDD R12 7 #  need to save this memory address of the start of the first matrix
+LDD R7 R12 # the value of the first matrix 
+ADD R12 1 
+
+# running sum to store to result 
+LDD R8 R15 # start at zero 
+
+# multiply the first two values 
+MUL R7 R6
+# add to running sum
+ADD R8 R7 
+
+# increment the store output address  
+ADD R14 1 
+
+# CHECK COUNTERS 
+# see if it is time to reset the counter 
+BE R5 R2 
+	if yes: 
+		# store to result to output
+		STD R14 R8
+		# reset the running sum 
+		LDD R8 R15 
+		LDD R5 R15 # reset counter 
+		# check second counter 
+		BE R4 R1
+		if yes: 
+			LDD R4 R15 #reset counter 
+			# check the first counter 
+			BE R3 R0
+				if yes:
+					END 
+				if no:
+					ADD R3 1
+		if no:
+			ADD R4 1 
+	if no: 
+		ADD R5 1
+
+# REDO LOOP 
+LDD R6 R13 # the second value of the first matrix 
+ADD R13 1 # increment memory address
+
+LDD R7 R12 # the second value of the first matrix 
+ADD R12 1 # increment memory address
+
+# multiply the first two values 
+MUL R7 R6
+# add to running sum
+ADD R8 R7 
+# store to result to output
+STD R14 R8
+# increment the store output address  
+ADD R14 1 
+
+# CHECK COUNTERS AGAIN 
+ 
+
