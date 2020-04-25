@@ -178,8 +178,14 @@ void alu_decode(Instruction *instruction, string binary_instruction, Pipeline* p
         // Immediate add or multiply 
         int operand1 = stoi(binary_instruction.substr(16,16), nullptr, 2);
         instruction->operands.push_back(operand1);
-        int operand2 = pipeline->register_bank.at(stoi(binary_instruction.substr(9, 4), nullptr, 2));
         cout << "Operand in immediate is: " << operand1 << " ";
+        
+        if (data_hazard_check(stoi(binary_instruction.substr(9, 4), nullptr, 2), pipeline))
+        {
+            return;
+        }
+        int operand2 = pipeline->register_bank.at(stoi(binary_instruction.substr(9, 4), nullptr, 2));
+        
         instruction->operands.push_back(operand2);
         instruction->write_back_register = stoi(binary_instruction.substr(9, 4), nullptr, 2);
         cout << "Entering to inflight: " << instruction->write_back_register << " ";
