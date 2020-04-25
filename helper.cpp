@@ -20,7 +20,7 @@ std::string show_cache_values() {
     std::basic_string<char> answer = "";
     std::basic_string<char> br  = "<br/>";
         for(int i = 0; i <= 10; i++)
-            answer += std::to_string(lilDaddy[i][0])  + std::to_string(lilDaddy[i][1]) + std::to_string(lilDaddy[i][2]) + br;
+            answer += "<tr><td>" + std::to_string(lilDaddy[i][0]) + "</td><td>" + std::to_string(lilDaddy[i][1]) + "</td><td> " + std::to_string(lilDaddy[i][2]) + "</td></tr>";
 
         std::cout << "Cache returned " << answer;
     
@@ -32,10 +32,11 @@ std::string show_register_bank_values() {
     if(pipeline != nullptr) {
         
     for(auto reg: pipeline->register_bank) {
+        info += "<tr><td>";
         info += std::to_string(reg.first);
-        info += " : ";
+        info += "</td><td>";
         info += std::to_string(reg.second);
-        info += "<br/>";
+        info += "</td></tr>";
     }
     }
     return info;
@@ -106,7 +107,7 @@ std::string runPipeline(int val) {
         
         std::basic_string<char> br  = "<br/>";
         for(int i = 0; i <= 40; i++)
-            answer += std::to_string(bigDaddy[i][0])  + std::to_string(bigDaddy[i][1]) + std::to_string(bigDaddy[i][2]) + br;
+            answer += "<tr><td>" + std::to_string(bigDaddy[i][0]) + "</td><td>" + std::to_string(bigDaddy[i][1]) + "</td><td> " + std::to_string(bigDaddy[i][2]) + "</td></tr>";
 
         std::cout << "String returned " << answer;
 
@@ -139,9 +140,8 @@ std::string runPipeline(int val) {
 	cout << "Result obtained was after searching: " << result << "\n";
         } else {
             
-        std::basic_string<char> br  = "<br/>";
         for(int i = 0; i <= 40; i++)
-            answer += std::to_string(bigDaddy[i][0])  + std::to_string(bigDaddy[i][1]) + std::to_string(bigDaddy[i][2]) + br;
+            answer +=  "<tr><td>" + std::to_string(bigDaddy[i][0]) + "</td><td>" + std::to_string(bigDaddy[i][1]) + "</td><td> "+ std::to_string(bigDaddy[i][2]) + "</td></tr>";
 
         std::cout << "String returned " << answer;
         }

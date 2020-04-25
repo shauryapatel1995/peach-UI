@@ -65,7 +65,7 @@ public:
   }
 
   sciter::string getRegs() {
-    
+
     std::string ans = show_register_bank_values();
     using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
     std::wstring_convert<convert_typeX, char16_t> converterX;
