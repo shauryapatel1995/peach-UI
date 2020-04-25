@@ -7,6 +7,7 @@
 extern int readMemory(int**, int);
 extern void run_pipeline(Cache*, int, int, Pipeline*);
 
+std::string fileToDisplay;
 
 Pipeline* pipeline = nullptr;
 
@@ -16,6 +17,22 @@ MainMemory * mainMem_array = nullptr;
 Cache * cache_array;
 
 std::string pipelineInfo = "";
+
+std::string show_file() {
+    if(fileToDisplay != "") 
+        return fileToDisplay;
+    std::cout << "Show file called!";
+    fileToDisplay = "";
+    fstream file;
+    file.open("./peach-1/assembler/test_matrix_instr.txt",ios::in);
+    std::string line; 
+    while(getline(file, line)){
+        fileToDisplay += line + "<br/>";
+    }
+    std::cout << "Read program" << fileToDisplay;
+    return fileToDisplay;
+}
+
 std::string show_cache_values() {
     std::basic_string<char> answer = "";
     std::basic_string<char> br  = "<br/>";

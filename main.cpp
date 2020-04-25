@@ -12,6 +12,7 @@ extern std::string getProg();
 extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
 extern std::string show_register_bank_values();
+extern std::string show_file();
 using namespace sciter;
 
 class frame: public sciter::window, sciter::event_handler {
@@ -28,9 +29,20 @@ public:
     FUNCTION_0("getPc", getPc);
     FUNCTION_0("getPipelineInfo", getPipelineInfo);
     FUNCTION_0("getRegs", getRegs);
+    FUNCTION_0("getProgram", getProgram);
   END_FUNCTION_MAP
   // function expsed to script:
   sciter::string  nativeMessage() { return WSTR("Hello C++ World"); }
+
+  sciter::string getProgram() {
+    
+    std::string ans = show_file();
+        std::cout << "Answer is: " << ans << std::endl;
+    
+		using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+		std::wstring_convert<convert_typeX , char16_t> converterX;
+		return converterX.from_bytes(ans);
+  }
   
   sciter::string showCache() {
       std::string ans = show_cache_values();
