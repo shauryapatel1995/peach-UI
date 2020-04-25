@@ -4,7 +4,7 @@
 #include "peach-1/mainMemory.h"
 #include "peach-1/pipeline-helper-new.h"
 
-extern int readMemory(int**, int);
+extern int readMemory(int**, int, std::string);
 extern void run_pipeline(Cache*, int, int, Pipeline*);
 
 std::string fileToDisplay;
@@ -18,26 +18,28 @@ Cache * cache_array;
 
 std::string pipelineInfo = "";
 
+std::string previous_file_name = "";
 std::string show_file(std::string fileName) {
     std::cout << "File to open is: " << fileName << "\n";
-    if(fileName == "matrix") {
-        
-        if(fileToDisplay != "") 
-            return fileToDisplay;
-        std::cout << "Show file called!";
-        fileToDisplay = "";
-        fstream file;
-        file.open("./peach-1/assembler/test_matrix_instr.txt",ios::in);
-        std::string line; 
-    
-        while(getline(file, line)){
-            fileToDisplay += line + "<br/>";
-        }
-    
+    if(previous_file_name == fileName) {
         return fileToDisplay;
     } else {
-        return "Program Not Implemented yet";
+        previous_file_name = fileName;
     }
+    std::cout << "Show file called!";
+    fileToDisplay = "";
+    fstream file;
+    file.open("./peach-1/assembler/" + fileName + ".txt",ios::in);
+    std::string line; 
+
+    while(getline(file, line)){
+        fileToDisplay += line + "<br/>";
+    }
+    if(fileToDisplay == "") 
+        return "Program not implemented yet";
+
+    return fileToDisplay;
+    
 }
 
 std::string show_cache_values() {
@@ -109,11 +111,11 @@ std::string get_pipeline_info() {
     return info;
 }
 
-std::string runPipeline(int val) {
+std::string runPipeline(int val, std::string fileName) {
     // 2-D array for cache 
         std::basic_string<char> answer = "";
-        if(bigDaddy == nullptr) {
-            
+        if(bigDaddy == nullptr || previous_file_name != fileName) {
+        pipeline = nullptr;
         // similar to malloc - allocating 100 spots 
         int sizeCache = 1024;
         int sizeMain = 65536;
@@ -126,7 +128,7 @@ std::string runPipeline(int val) {
         }
         std::cout << "Initializing memory!";
         // initializing main memory with the text file 
-        readMemory(bigDaddy, sizeMain);
+        readMemory(bigDaddy, sizeMain, fileName);
         std::cout << (bigDaddy, sizeMain) << " Answer!";
         
         std::basic_string<char> br  = "<br/>";

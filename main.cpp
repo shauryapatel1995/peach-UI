@@ -6,7 +6,7 @@
 #include <utility>
 
 
-extern std::string runPipeline(int va11);
+extern std::string runPipeline(int va11, std::string val2);
 extern void run_pipeline_real(int);
 extern std::string getProg();
 extern std::string get_total_pipeline_info();
@@ -25,7 +25,7 @@ public:
     FUNCTION_0("nativeMessage", nativeMessage);
     FUNCTION_0("showCache",showCache);
     FUNCTION_1("run_pipeline",run_pipeline);
-    FUNCTION_1("runPipelineUI", runPipelineUI);
+    FUNCTION_2("runPipelineUI", runPipelineUI);
     FUNCTION_0("getPc", getPc);
     FUNCTION_0("getPipelineInfo", getPipelineInfo);
     FUNCTION_0("getRegs", getRegs);
@@ -38,7 +38,7 @@ public:
   sciter::string getProgram(sciter::value val) {
     using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
     std::wstring_convert<convert_typeX, char16_t> converterX;
-    sciter::string val_string = val.get((WCHAR*)val_string.c_str());
+    sciter::string val_string = val.get((WCHAR *)val_string.c_str());
     std::string a = converterX.to_bytes(val_string);
     std::string ans = show_file(a);
     return converterX.from_bytes(ans);
@@ -50,11 +50,14 @@ public:
 		std::wstring_convert<convert_typeX , char16_t> converterX;
 		return converterX.from_bytes(ans);
   }
-  sciter::string runPipelineUI(sciter::value val1) {
-    int a;
-    std::string ans = runPipeline(val1.get(a));
+  sciter::string runPipelineUI(sciter::value val1, sciter::value val2) {
     using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
 		std::wstring_convert<convert_typeX , char16_t> converterX;
+    int a;
+    sciter::string val_string = val2.get((WCHAR *)val_string.c_str());
+    std::string file = converterX.to_bytes(val_string);
+    std::string ans = runPipeline(val1.get(a), file);
+    
 		return converterX.from_bytes(ans);
   }
   sciter::string run_pipeline(sciter::value val) {

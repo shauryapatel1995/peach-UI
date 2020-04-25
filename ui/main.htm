@@ -125,7 +125,14 @@
             var pipe = $(button#pipe);
 
             btn.onClick = function() {
-                
+                var pipeline_header = "<thead>
+                    <tr>
+                        <th>Decode</th>
+                        <th>Execute</th>
+                        <th>Memory</th>
+                        <th>Write back</th>
+                    </tr>
+                </thead>";
                 var program_name = self#program-select.value;
                
                 var memory = self#memory;
@@ -139,9 +146,15 @@
                 var cacheval = "<thead><tr><th>Tag</th><th>Index</th><th>Memory</th></tr></thead>";
                 var regval = "<thead><tr><th>Register</th><th>Value</th></tr></thead>";
                 pc.html = "Program Counter: " + view.getPc();
-                memory.html = memoryval + view.runPipelineUI(50);
-                pipe.html =  pipeval + view.getPipelineInfo();
-                cache.html = cacheval + view.showCache();
+                memory.html = memoryval + view.runPipelineUI(50, program_name);
+                
+                var pipeline = view.getPipelineInfo();
+                if(pipeline == "")
+                    pipe.html = pipeline_header;
+                else 
+                    pipe.html = pipeval + pipeline;
+                
+                    cache.html = cacheval + view.showCache();
                 regs.html = regval + view.getRegs();
                 program.html = view.getProgram(program_name);
 

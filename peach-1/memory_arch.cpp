@@ -8,13 +8,20 @@ using namespace std;
 
 extern void run_pipeline(Cache* cache, int sizeCache);
 
-int readMemory (int **bigDaddy, int size) {
+int readMemory (int **bigDaddy, int size, std::string fileName) {
 	std::cout << "Reading file!";
 	string x;
 	ifstream myFile;
     // bin_test_matrix_instr.txt
     // ./peach-1/sort-final.txt
-	myFile.open("./peach-1/bin_test_matrix_instr.txt");
+	if (fileName == "matrix")
+	{
+		myFile.open("./peach-1/bin_test_matrix_instr.txt");
+	}
+	else
+	{
+		myFile.open("./peach-1/" + fileName + ".txt");
+	}
 	int iter = 0;
     if (myFile.is_open())
     {

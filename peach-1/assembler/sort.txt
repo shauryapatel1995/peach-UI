@@ -1,0 +1,21 @@
+Load R0, 0
+LOAD R2, [R0]
+LOAD R3, 0
+load r4, 1
+CMP R3, R2
+LDD R1, 1
+ADD R3, 1
+BE END
+CMP R4, R2
+BE Start_loop
+ADD R4, 1
+LDD R5, [R1]
+ADD R1, 1
+LDD R6, [R1]
+CMP R5, R6
+BL
+LDD R7, 0
+ADD R5, R7, R7
+STR R6, [R4]
+STR R7, [R1]
+B unconditional
