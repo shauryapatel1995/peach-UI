@@ -105,7 +105,7 @@ std::string runPipeline(int val) {
         std::cout << (bigDaddy, sizeMain) << " Answer!";
         
         std::basic_string<char> br  = "<br/>";
-        for(int i = 0; i <= 10; i++)
+        for(int i = 0; i <= 40; i++)
             answer += std::to_string(bigDaddy[i][0])  + std::to_string(bigDaddy[i][1]) + std::to_string(bigDaddy[i][2]) + br;
 
         std::cout << "String returned " << answer;
@@ -140,7 +140,7 @@ std::string runPipeline(int val) {
         } else {
             
         std::basic_string<char> br  = "<br/>";
-        for(int i = 0; i <= 10; i++)
+        for(int i = 0; i <= 40; i++)
             answer += std::to_string(bigDaddy[i][0])  + std::to_string(bigDaddy[i][1]) + std::to_string(bigDaddy[i][2]) + br;
 
         std::cout << "String returned " << answer;

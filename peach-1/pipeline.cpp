@@ -145,6 +145,7 @@ void alu_decode(Instruction *instruction, string binary_instruction, Pipeline* p
     instruction->addressing_mode = stoi(binary_instruction.substr(7, 1), nullptr, 2);
     instruction->immediate = stoi(binary_instruction.substr(8, 1), nullptr, 2);
 
+    // opcode == 13 means CMP
     if(instruction->opcode == 13)
         pipeline->condition_being_written = 1;
 
@@ -174,7 +175,7 @@ void alu_decode(Instruction *instruction, string binary_instruction, Pipeline* p
         }
     else
     {
-        // Immediate add
+        // Immediate add or multiply 
         int operand1 = stoi(binary_instruction.substr(16,16), nullptr, 2);
         instruction->operands.push_back(operand1);
         int operand2 = pipeline->register_bank.at(stoi(binary_instruction.substr(9, 4), nullptr, 2));
@@ -425,6 +426,11 @@ int execute(Pipeline* pipeline){
                     // CMP instruction 
                     execute_instruction->result = execute_instruction->operands.at(0) - execute_instruction->operands.at(1);
                     cout << "Result is " << execute_instruction->result << " ";
+                } else if (execute_instruction->opcode == 2) {
+                    // MUL instruction
+                    execute_instruction->result = execute_instruction->operands.at(0) * execute_instruction->operands.at(1);
+                    cout << "\nTHIS IS MULTIPLICATION!!\n\n";
+                    cout << "Result is: " << execute_instruction->result << " ";
                 }
             } else if(execute_instruction->instruction_type == 4 && execute_instruction->opcode != 0) {
                 // Branch instruction calculate the new program_counter, check condition and set PC 
@@ -694,6 +700,10 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         // Increment the current cycle 
         pipeline->total_cycles++;
         cout << "Cycle ";
+        
+        if (pipeline->program_counter == 8445) {
+            cout << "DEBUG the core dumped\n";
+        }
 
         if (pipeline->continue_write_back && pipeline->write_back_wait_time == 0)
         {

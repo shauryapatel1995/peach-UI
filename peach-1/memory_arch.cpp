@@ -12,8 +12,14 @@ int readMemory (int **bigDaddy, int size) {
 	std::cout << "Reading file!";
 	string x;
 	ifstream myFile;
-	myFile.open("./peach-1/sort-final.txt");
+    // bin_test_matrix_instr.txt
+    // ./peach-1/sort-final.txt
+	myFile.open("./peach-1/bin_test_matrix_instr.txt");
 	int iter = 0;
+    if (myFile.is_open())
+    {
+        cout << "THE FILE WAS OPENED!!\n";
+    }
 	while (myFile >> x)
 	{
 		
