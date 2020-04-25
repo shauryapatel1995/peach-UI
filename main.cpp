@@ -12,7 +12,7 @@ extern std::string getProg();
 extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
 extern std::string show_register_bank_values();
-extern std::string show_file();
+extern std::string show_file(std::string a);
 using namespace sciter;
 
 class frame: public sciter::window, sciter::event_handler {
@@ -29,47 +29,41 @@ public:
     FUNCTION_0("getPc", getPc);
     FUNCTION_0("getPipelineInfo", getPipelineInfo);
     FUNCTION_0("getRegs", getRegs);
-    FUNCTION_0("getProgram", getProgram);
+    FUNCTION_1("getProgram", getProgram);
   END_FUNCTION_MAP
   // function expsed to script:
   sciter::string  nativeMessage() { return WSTR("Hello C++ World"); }
 
-  sciter::string getProgram() {
-    
-    std::string ans = show_file();
-        std::cout << "Answer is: " << ans << std::endl;
-    
-		using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
-		std::wstring_convert<convert_typeX , char16_t> converterX;
-		return converterX.from_bytes(ans);
+  
+  sciter::string getProgram(sciter::value val) {
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::wstring_convert<convert_typeX, char16_t> converterX;
+    sciter::string val_string = val.get((WCHAR*)val_string.c_str());
+    std::string a = converterX.to_bytes(val_string);
+    std::string ans = show_file(a);
+    return converterX.from_bytes(ans);
   }
   
   sciter::string showCache() {
-      std::string ans = show_cache_values();
-        std::cout << "Answer is: " << ans << std::endl;
-    
-		using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::string ans = show_cache_values();
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
 		std::wstring_convert<convert_typeX , char16_t> converterX;
 		return converterX.from_bytes(ans);
   }
   sciter::string runPipelineUI(sciter::value val1) {
-      int a;
-        std::string ans = runPipeline(val1.get(a));
-    
-    
-		using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    int a;
+    std::string ans = runPipeline(val1.get(a));
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
 		std::wstring_convert<convert_typeX , char16_t> converterX;
 		return converterX.from_bytes(ans);
   }
   sciter::string run_pipeline(sciter::value val) {
       int a = val.get(a);
-      
-      std::cout << "Printing from the function " << a << std::endl;
       run_pipeline_real(a);
       return WSTR("RAN!");
   } 
   sciter::string getPc() {
-      std::cout << "Searching for Prog counter" << std::endl;
+     
       std::string ans = getProg();
       using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
 		std::wstring_convert<convert_typeX , char16_t> converterX;

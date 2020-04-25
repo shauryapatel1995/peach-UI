@@ -18,7 +18,7 @@ int readMemory (int **bigDaddy, int size) {
 	int iter = 0;
     if (myFile.is_open())
     {
-        cout << "THE FILE WAS OPENED!!\n";
+        // cout << "THE FILE WAS OPENED!!\n";
     }
 	while (myFile >> x)
 	{
@@ -29,7 +29,7 @@ int readMemory (int **bigDaddy, int size) {
 		int tag = stoi(tagStr, nullptr, 2);
 		int index = stoi(indexStr, nullptr, 2);
 		long value = stol(valueStr, nullptr, 2);
-		std::cout << "\n this is my tag: " << tag << ", this is my index: " << index << ", this is my value: " << value << "\n";
+		//std::cout << "\n this is my tag: " << tag << ", this is my index: " << index << ", this is my value: " << value << "\n";
 		if (iter < size) {
 			bigDaddy[iter][0] = tag; 
 			bigDaddy[iter][1] = index;
@@ -38,7 +38,7 @@ int readMemory (int **bigDaddy, int size) {
 
 		}
 	}
-	std::cout << "Well loop doesn't work! \n";
+	//std::cout << "Well loop doesn't work! \n";
 	return 50; 
 }
 

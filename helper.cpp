@@ -18,19 +18,26 @@ Cache * cache_array;
 
 std::string pipelineInfo = "";
 
-std::string show_file() {
-    if(fileToDisplay != "") 
+std::string show_file(std::string fileName) {
+    std::cout << "File to open is: " << fileName << "\n";
+    if(fileName == "matrix") {
+        
+        if(fileToDisplay != "") 
+            return fileToDisplay;
+        std::cout << "Show file called!";
+        fileToDisplay = "";
+        fstream file;
+        file.open("./peach-1/assembler/test_matrix_instr.txt",ios::in);
+        std::string line; 
+    
+        while(getline(file, line)){
+            fileToDisplay += line + "<br/>";
+        }
+    
         return fileToDisplay;
-    std::cout << "Show file called!";
-    fileToDisplay = "";
-    fstream file;
-    file.open("./peach-1/assembler/test_matrix_instr.txt",ios::in);
-    std::string line; 
-    while(getline(file, line)){
-        fileToDisplay += line + "<br/>";
+    } else {
+        return "Program Not Implemented yet";
     }
-    std::cout << "Read program" << fileToDisplay;
-    return fileToDisplay;
 }
 
 std::string show_cache_values() {
@@ -39,7 +46,7 @@ std::string show_cache_values() {
         for(int i = 0; i <= 10; i++)
             answer += "<tr><td>" + std::to_string(lilDaddy[i][0]) + "</td><td>" + std::to_string(lilDaddy[i][1]) + "</td><td> " + std::to_string(lilDaddy[i][2]) + "</td></tr>";
 
-        std::cout << "Cache returned " << answer;
+        std::cout << "Cache returned ";
     
     return answer;
 }
@@ -126,7 +133,7 @@ std::string runPipeline(int val) {
         for(int i = 0; i <= 40; i++)
             answer += "<tr><td>" + std::to_string(bigDaddy[i][0]) + "</td><td>" + std::to_string(bigDaddy[i][1]) + "</td><td> " + std::to_string(bigDaddy[i][2]) + "</td></tr>";
 
-        std::cout << "String returned " << answer;
+        std::cout << "Main mem returned returned ";
 
         
 	lilDaddy = new int *[sizeCache];
@@ -160,7 +167,7 @@ std::string runPipeline(int val) {
         for(int i = 0; i <= 40; i++)
             answer +=  "<tr><td>" + std::to_string(bigDaddy[i][0]) + "</td><td>" + std::to_string(bigDaddy[i][1]) + "</td><td> "+ std::to_string(bigDaddy[i][2]) + "</td></tr>";
 
-        std::cout << "String returned " << answer;
+        std::cout << "Main mem returned ";
         }
     return answer;
 }

@@ -60,7 +60,12 @@
         <div id="parent_div_2">
         
         <div class="child_div_1">
-            <p id="program">Program text will go here </p>
+            <select name="fields[Program]" id="program-select">
+                <option value="loop">Loop and count</option>
+                <option value="sort">Sort</option>
+                <option value="matrix">Matrix multiply</option>
+            </select>
+            <p id="program"></p>
             
         </div>
         </div>
@@ -121,7 +126,8 @@
 
             btn.onClick = function() {
                 
-                stdout.println("Running");
+                var program_name = self#program-select.value;
+               
                 var memory = self#memory;
                 var pc = self#PC;
                 var pipe = self#pipeinfo;
@@ -137,7 +143,7 @@
                 pipe.html =  pipeval + view.getPipelineInfo();
                 cache.html = cacheval + view.showCache();
                 regs.html = regval + view.getRegs();
-                program.html = view.getProgram();
+                program.html = view.getProgram(program_name);
 
             };
 
