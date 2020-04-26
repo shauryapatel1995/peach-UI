@@ -85,6 +85,12 @@ struct Pipeline
 
     // Flag to indicate data hazard.
     int data_hazard = 0;
+
+    int fetch_stopped;
+    int decode_stopped; 
+    int execute_stopped; 
+    int memory_access_stopped; 
+    int write_back_stopped;
 };
 
 typedef Pipeline Pipeline; 

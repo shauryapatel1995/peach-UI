@@ -56,7 +56,8 @@
         <input id="numCycles" type="integer">
         Enter number of cycles
         </textarea>
-        <p id="PC">Program Counter:</p>
+        <p id="PC">Program Counter: </p>
+        <p id="total-cycles">Total Cycles: </p>
         <div id="parent_div_2">
         
         <div class="child_div_1">
@@ -142,9 +143,12 @@
                     </tr>
                 </thead>";
                 var program_name = self#program-select.value;
+
+                
                
                 var memory = self#memory;
                 var pc = self#PC;
+                var cycles = self#total-cycles;
                 var pipe = self#pipeinfo;
                 var cache = self#cache;
                 var regs = self#regs;
@@ -155,7 +159,8 @@
                 var regval = "<thead><tr><th>Register</th><th>Value</th></tr></thead>";
                 pc.html = "Program Counter: " + view.getPc();
                 memory.html = memoryval + view.runPipelineUI(50, program_name);
-                
+                cycles.html = "Total Cycles: " + view.total_cycles();
+
                 var pipeline = view.getPipelineInfo();
                 if(pipeline == "")
                     pipe.html = pipeline_header;

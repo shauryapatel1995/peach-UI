@@ -5,7 +5,7 @@
 #include "peach-1/pipeline-helper-new.h"
 
 extern int readMemory(int**, int, std::string);
-extern void run_pipeline(Cache*, int, int, Pipeline*);
+extern int run_pipeline(Cache*, int, int, Pipeline*);
 
 std::string fileToDisplay;
 
@@ -17,6 +17,8 @@ MainMemory * mainMem_array = nullptr;
 Cache * cache_array;
 
 std::string pipelineInfo = "";
+
+int total_cycles;
 
 std::string previous_file_name = "";
 std::string show_file(std::string fileName) {
@@ -40,6 +42,9 @@ std::string show_file(std::string fileName) {
 
     return fileToDisplay;
     
+}
+std::string getTotalCycles() {
+    return std::to_string(total_cycles);
 }
 
 std::string show_cache_values() {
@@ -115,6 +120,7 @@ std::string runPipeline(int val, std::string fileName) {
     // 2-D array for cache 
         std::basic_string<char> answer = "";
         if(bigDaddy == nullptr || previous_file_name != fileName) {
+        total_cycles = 0;
         pipeline = nullptr;
         // similar to malloc - allocating 100 spots 
         int sizeCache = 1024;
@@ -200,10 +206,12 @@ void run_pipeline_real(int cycles, std::string config) {
         } else if(config == "c") {
             // Disable pipeline
             pipeline->single_instruction = 1;
+            pipeline->enable_cache = 1;
         }  else {
             pipeline->single_instruction = 1;
             pipeline->enable_cache = 0;
         }
+        
     }
 
     std::cout << "Running pipeline! Cycles are: " << cycles << std::endl;
@@ -212,9 +220,11 @@ void run_pipeline_real(int cycles, std::string config) {
    
 	int count = 0;
     while(count < cycles) {
-        run_pipeline(cache_array, 1024, 1, pipeline);
+        total_cycles += run_pipeline(cache_array, 1024, 1, pipeline);
         pipelineInfo += get_pipeline_info();
         //std::cout << pipelineInfo;
+        if(pipeline->write_back_stopped)
+            return;
         count++;
     }
     

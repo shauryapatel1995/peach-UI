@@ -13,6 +13,7 @@ extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
 extern std::string show_register_bank_values();
 extern std::string show_file(std::string a);
+extern std::string getTotalCycles();
 using namespace sciter;
 
 class frame: public sciter::window, sciter::event_handler {
@@ -30,10 +31,17 @@ public:
     FUNCTION_0("getPipelineInfo", getPipelineInfo);
     FUNCTION_0("getRegs", getRegs);
     FUNCTION_1("getProgram", getProgram);
+    FUNCTION_0("total_cycles", total_cycles);
   END_FUNCTION_MAP
   // function expsed to script:
   sciter::string  nativeMessage() { return WSTR("Hello C++ World"); }
 
+  sciter::string total_cycles() {
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::wstring_convert<convert_typeX, char16_t> converterX;
+    std::string ans = getTotalCycles();
+    return converterX.from_bytes(ans);
+  }
   
   sciter::string getProgram(sciter::value val) {
     using convert_typeX = std::codecvt_utf8_utf16<char16_t>;

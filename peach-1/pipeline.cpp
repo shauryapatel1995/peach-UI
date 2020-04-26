@@ -687,7 +687,7 @@ int write_back(Pipeline* pipeline) {
     return 0;
 }
 
-void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pipeline) {
+int run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pipeline) {
     // pipeline->continue_fetch = 1;
     // pipeline->continue_decode = 1;
     // pipeline->continue_execute = 1;
@@ -719,15 +719,18 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         // Increment the current cycle 
         pipeline->total_cycles++;
         cout << "Cycle ";
-        
-        if (pipeline->program_counter == 8445) {
-            cout << "DEBUG the core dumped\n";
-        }
 
         if (pipeline->continue_write_back && pipeline->write_back_wait_time == 0)
         {
 
             pipeline->write_back_instruction = pipeline->write_back_instructions[0];
+
+             if(pipeline->write_back_instruction->isNoop && pipeline->memory_access_stopped) {
+                 cout << "STOPPING WRITE BACK!\n";
+                 pipeline->write_back_stopped = 1;
+                 break; 
+             }
+                
             Instruction *noop = new Instruction();
             noop->isNoop = 1;
             pipeline->write_back_instructions[0] = noop;
@@ -739,7 +742,11 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         {
 
             pipeline->memory_access_instruction = pipeline->memory_access_instructions[0];
-            
+             if(pipeline->memory_access_instruction->isNoop && pipeline->execute_stopped) {
+                 pipeline->memory_access_stopped = 1; 
+                 cout << "\nSTOPPING EXECUTE\n";
+             }
+                
             Instruction *noop = new Instruction();
             noop->isNoop = 1;
             pipeline->memory_access_instructions[0] = noop;
@@ -751,7 +758,12 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         {
 
             pipeline->execute_instruction = pipeline->execute_instructions[0];
-            
+            if(pipeline->execute_instruction->isNoop && pipeline->decode_stopped) {
+                pipeline->execute_stopped = 1; 
+                cout << "\nSTOPPING EXECUTE\n";
+            }
+                
+
             Instruction *noop = new Instruction();
             noop->isNoop = 1;
             pipeline->execute_instructions[0] = noop;
@@ -762,6 +774,11 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         if (pipeline->continue_decode && pipeline->decode_wait_time == 0 && !pipeline->data_hazard)
         {
             pipeline->decode_instruction = pipeline->decode_instructions[0];
+            if(pipeline->decode_instruction == -1 && pipeline->fetch_stopped) {
+                pipeline->decode_stopped = 1;
+                cout << "\nSTOPPING DECODE\n";
+            }
+                
             std::cout << "Decode instruction is: " << pipeline->decode_instruction;
             pipeline->decode_instructions[0] = -1;
         }
@@ -776,25 +793,28 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
                 pipeline->continue_fetch = 0;
                 cout << "\nStopping fetch because of single instruction!\n";
             }   
-        }
-            
-        else {
-            cout << "Fetch temporarily stopping!";
-            cout << "Pipeline squash is?: " << pipeline->squash_instructions;
+        } else {
+            cout << "\nSTOPPED FETCH!\n";
+            if(pipeline->program_counter >= pipeline->last_instruction) {
+                pipeline->fetch_stopped = 1;
+                cout << "\nSTOPPING FETCH\n";
+            }
+                
+
         }
         // Here update the pipeline object with the instruction for the next cycle. 
         // We will keep a buffer for each 1 and use the buffer to decide the next object.
 
         // std::this_thread::sleep_for(0.05s);
 
-        cout << "Cache values are: "; 
+        
 
         cycles++;   
     }
     cout << "Cycles taken are: " << pipeline->total_cycles << "\n";
     pipeline->total_cycles = 0;
     
-    return;
+    return cycles;
     
 }
 
