@@ -273,6 +273,7 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
         // Means NOOP
         if(pipeline->fetch_wait_time == 0) {
             // Push the stored value in this
+            
             if(!pipeline->squash_instructions) {
 
                 pipeline->decode_instructions[0] = pipeline->stored_fetch_result;
@@ -324,8 +325,8 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
             pipeline->decode_instructions[0] = result;
             pipeline->program_counter++;
         }
-        if(pipeline->single_instruction)
-            pipeline->continue_fetch = 0;
+        
+            
     } else {
         cout << "Stalled!! ";
     }
@@ -660,7 +661,7 @@ int write_back(Pipeline* pipeline) {
         } else if(pipeline->continue_memory_access == 0) {
             restart_memory_access(pipeline);
         } else {}
-        if(pipeline->single_instruction)
+        if(pipeline->single_instruction && pipeline->continue_decode == 1)
             pipeline->continue_fetch = 1;
 
         // if(write_back_instruction->instruction_type == 1 && write_back_instruction->opcode == 2)
@@ -705,7 +706,7 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
     // write_back_instructions.push_back(noop);
 
     pipeline->register_bank.insert(pair<int, int>(5,0));
-    while(pipeline->program_counter < 8478 && cycleCount > cycles) {
+    while(cycleCount > cycles) {
         std::cout << "Program counter is: " << pipeline->program_counter;
         // Increment the current cycle 
         pipeline->total_cycles++;
@@ -760,8 +761,15 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         decode(pipeline);
 
         
-        if((pipeline->program_counter < 8476 && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0)
+        if((pipeline->program_counter < pipeline->last_instruction && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0) {
             fetch(cache_array, sizeCache, pipeline);
+           
+            if(pipeline->single_instruction) {
+                pipeline->continue_fetch = 0;
+                cout << "\nStopping fetch because of single instruction!\n";
+            }   
+        }
+            
         else {
             cout << "Fetch temporarily stopping!";
             cout << "Pipeline squash is?: " << pipeline->squash_instructions;

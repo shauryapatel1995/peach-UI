@@ -155,16 +155,7 @@ std::string runPipeline(int val, std::string fileName) {
      mainMem_array = new MainMemory(bigDaddy, nullptr, lilDaddy, 10, "main", sizeMain);
 	 cache_array = new Cache(lilDaddy,mainMem_array, bigDaddy, 1, "cache", sizeCache);
 
-    
-    desiredAddress[0] = 8;
-	desiredAddress[1] = 242;
-	desiredAddress[2] = -1;
-	//printing the desired address
-	cout << "This is the desired address: " << desiredAddress[0] << desiredAddress[1] << desiredAddress[2] <<"\n";
-    
-    cache_array->search(desiredAddress, &result);
-	cout << "Result obtained was after searching: " << result << "\n";
-        } else {
+  } else {
             
         for(int i = 0; i <= 40; i++)
             answer +=  "<tr><td>" + std::to_string(bigDaddy[i][0]) + "</td><td>" + std::to_string(bigDaddy[i][1]) + "</td><td> "+ std::to_string(bigDaddy[i][2]) + "</td></tr>";
@@ -174,7 +165,7 @@ std::string runPipeline(int val, std::string fileName) {
     return answer;
 }
 
-void run_pipeline_real(int cycles) {
+void run_pipeline_real(int cycles, std::string config) {
 
     if(pipeline == nullptr) {
         pipeline = new Pipeline();
@@ -189,22 +180,34 @@ void run_pipeline_real(int cycles) {
         pipeline->execute_instructions[0] = noop;
         pipeline->write_back_instructions[0] = noop;
         pipeline->memory_access_instructions[0] = noop;
+        if(previous_file_name == "matrix") 
+            pipeline->last_instruction = 8450;
+        else if(previous_file_name == "sort")
+            pipeline->last_instruction = 8450; 
+        else if(previous_file_name == "loop")
+            pipeline->last_instruction = 8438;
+        pipeline->register_bank.insert(pair<int, int>(6,0));
+
+        cout << "Config is " << config;
+        if(config == "cp") {
+            cout << "Both pipeline and cache working right now!";
+            pipeline->single_instruction = 0;
+        } else if(config == "p") {
+            // Disable cache
+            // pipeline->cache = mainMem_array;
+        } else if(config == "c") {
+            // Disable pipeline
+            pipeline->single_instruction = 1;
+        }  else {
+            pipeline->single_instruction = 1;
+        }
     }
 
     std::cout << "Running pipeline! Cycles are: " << cycles << std::endl;
     
     int result = 0;
-        // declaring the address we will be searching for in memory 
-    int desiredAddress[3]{0};
-    desiredAddress[0] = 8;
-	desiredAddress[1] = 242;
-	desiredAddress[2] = -1;
-	//printing the desired address
-	cout << "This is the desired address: " << desiredAddress[0] << desiredAddress[1] << desiredAddress[2] <<"\n";
-    
-    cache_array->search(desiredAddress, &result);
-	cout << "Result obtained was after searching: " << result << "\n";
-    int count = 0;
+   
+	int count = 0;
     while(count < cycles) {
         run_pipeline(cache_array, 1024, 1, pipeline);
         pipelineInfo += get_pipeline_info();

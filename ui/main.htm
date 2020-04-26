@@ -60,10 +60,18 @@
         <div id="parent_div_2">
         
         <div class="child_div_1">
+            Select Program :
             <select name="fields[Program]" id="program-select">
                 <option value="loop">Loop and count</option>
                 <option value="sort">Sort</option>
                 <option value="matrix">Matrix multiply</option>
+            </select><br/>
+            Select Config: 
+            <select name="fields[Program]" id="config-select">
+            <option value="cp">Enable cache and pipeline</option>
+            <option value="c">Enable cache only</option>
+            <option value="p">Enable pipeline only</option>
+            <option value="ncp">Disable cache and pipeline</option>
             </select>
             <p id="program"></p>
             
@@ -162,9 +170,10 @@
 
             pipe.onClick = function() {
                 var cycles = self#numCycles;
+                var config = self#config-select.value;
                 stdout.println("Running pipeline");
                 stdout.println(cycles.value);
-                view.run_pipeline(cycles.value);
+                view.run_pipeline(cycles.value, config);
             };
     </script>
         

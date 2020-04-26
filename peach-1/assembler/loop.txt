@@ -1,0 +1,11 @@
+(LDD R0 0) - 27
+(LDD R1 R0) - 28
+(LDD R2 0) - 29
+(CMP R2 R1) - 30
+(BE 6) - 31
+(ADD R2 1) - 32
+(LDD R4 R2) - 33
+(ADD R4 R5 R5) - 34
+(ADD R0 1) - 35
+(B u -8) - 36
+(STR R6 R0) - 37

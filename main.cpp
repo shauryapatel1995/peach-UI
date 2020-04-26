@@ -7,7 +7,7 @@
 
 
 extern std::string runPipeline(int va11, std::string val2);
-extern void run_pipeline_real(int);
+extern void run_pipeline_real(int, std::string);
 extern std::string getProg();
 extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
@@ -24,7 +24,7 @@ public:
   BEGIN_FUNCTION_MAP
     FUNCTION_0("nativeMessage", nativeMessage);
     FUNCTION_0("showCache",showCache);
-    FUNCTION_1("run_pipeline",run_pipeline);
+    FUNCTION_2("run_pipeline",run_pipeline);
     FUNCTION_2("runPipelineUI", runPipelineUI);
     FUNCTION_0("getPc", getPc);
     FUNCTION_0("getPipelineInfo", getPipelineInfo);
@@ -60,9 +60,13 @@ public:
     
 		return converterX.from_bytes(ans);
   }
-  sciter::string run_pipeline(sciter::value val) {
+  sciter::string run_pipeline(sciter::value val, sciter::value val2) {
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::wstring_convert<convert_typeX, char16_t> converterX;
       int a = val.get(a);
-      run_pipeline_real(a);
+    sciter::string val_string = val2.get((WCHAR *)val_string.c_str());
+    std::string config = converterX.to_bytes(val_string);
+      run_pipeline_real(a, config);
       return WSTR("RAN!");
   } 
   sciter::string getPc() {

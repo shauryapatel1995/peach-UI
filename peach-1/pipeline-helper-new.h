@@ -51,7 +51,7 @@ struct Pipeline
     int write_back_wait_time;
 
     int program_counter = 8427;
-
+    int last_instruction;
     // Set condition register statically for now
     int condition_register = 0;
 
