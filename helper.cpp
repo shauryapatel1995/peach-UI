@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <queue>
 #include "peach-1/mainMemory.h"
 #include "peach-1/pipeline-helper-new.h"
 
@@ -10,6 +11,8 @@ extern int run_pipeline(Cache*, int, int, Pipeline*);
 std::string fileToDisplay;
 
 Pipeline* pipeline = nullptr;
+
+std::queue<std::string> pipelineInformation;
 
 int **bigDaddy = nullptr;
 int **lilDaddy = nullptr;
@@ -94,8 +97,11 @@ std::string getProg() {
 }
 
 std::string get_total_pipeline_info() {
-    std::string ans = pipelineInfo;
-    pipelineInfo = "";
+    std::string ans = "";
+    while(!pipelineInformation.empty()) {
+        ans += pipelineInformation.front();
+        pipelineInformation.pop();
+    }
     return ans;
 }
 
@@ -234,6 +240,12 @@ void run_pipeline_real(int cycles, std::string config) {
         total_cycles += run_pipeline(cache_array, 1024, 1, pipeline);
         pipelineInfo += get_pipeline_info();
         //std::cout << pipelineInfo;
+        pipelineInformation.push(pipelineInfo); 
+        
+        if(pipelineInformation.size() > 100)
+            pipelineInformation.pop();
+        
+        pipelineInfo = "";
         if(pipeline->write_back_stopped)
             return;
         count++;
