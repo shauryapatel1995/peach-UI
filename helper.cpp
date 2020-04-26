@@ -107,7 +107,7 @@ std::string get_total_pipeline_info() {
 
 std::string get_pipeline_info() {
     std::string info = "";
-    std::cout << "Getting pipeline info!" << std::endl;
+    // std::cout << "Getting pipeline info!" << std::endl;
     
     info += "<tr>";
     info += "<td>";
@@ -206,7 +206,7 @@ void run_pipeline_real(int cycles, std::string config) {
         pipeline->memory_access_instructions[0] = noop;
         if(previous_file_name == "matrix") 
             pipeline->last_instruction = 8490;
-        else if(previous_file_name == "sort")
+        else if(previous_file_name == "sort" || previous_file_name == "sort-large")
             pipeline->last_instruction = 8450; 
         else if(previous_file_name == "loop")
             pipeline->last_instruction = 8438;
@@ -238,17 +238,18 @@ void run_pipeline_real(int cycles, std::string config) {
 	int count = 0;
     while(count < cycles) {
         total_cycles += run_pipeline(cache_array, 1024, 1, pipeline);
-        pipelineInfo += get_pipeline_info();
+        // pipelineInfo += get_pipeline_info();
         //std::cout << pipelineInfo;
-        pipelineInformation.push(pipelineInfo); 
+        // pipelineInformation.push(pipelineInfo); 
         
-        if(pipelineInformation.size() > 100)
-            pipelineInformation.pop();
+        /*if(pipelineInformation.size() > 100)
+            pipelineInformation.pop(); */
         
-        pipelineInfo = "";
         if(pipeline->write_back_stopped)
             return;
         count++;
     }
+
+    cout << "Cycles completed " << count << "\n"; 
     
 }

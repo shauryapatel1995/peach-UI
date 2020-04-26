@@ -21,7 +21,7 @@ Memory::Memory(int** memory, Memory *main_memory, int ** nextMemoryArray, int wa
 // searches through the cache or main memory matrices for address
 // FIXME - The size cannot work for integer for 32 bits because of signed, unsigned issue. 
 int Memory::search(int address[], int* result){
-	cout << "searching\n";
+	// cout << "searching\n";
 	// found it flag 
 	int foundMemory = 0;
 	// address is an 1x3 array: tag, index, value 
@@ -44,7 +44,7 @@ int Memory::search(int address[], int* result){
 			//cout << "this is the index in memory: " << r << "\n";
 			*result = foundValue;
 			// return the cycles it took to run it
-			cout << "What is the wait time? " << this->mem_wait_time << " ";
+			// cout << "What is the wait time? " << this->mem_wait_time << " ";
 			return this->mem_wait_time;	
 		} else {
 			// if(this->memId == "main")
@@ -76,7 +76,7 @@ void Memory::replace(int address[], int value, int size){
 		}
 	}
 	if (replaced == 0){
-		cout<<"did not find the address to replace\n";
+		// cout<<"did not find the address to replace\n";
 	}
 }
 
@@ -86,14 +86,14 @@ int Cache::search(int address[], int* result) {
 	// TODO: Change this. We are using this for now.
 	*result = -1;
 	int wait_time = Memory::search(address, result);
-	cout << "Result is: " << *result << "\n";
+	// cout << "Result is: " << *result << "\n";
 
 	if(*result == -1) {
-		cout << "Going to the next level!\n";
+		// cout << "Going to the next level!\n";
 		int wait_time_next_level = next_level->search(address, result);
 		int value = *result;
 		Memory::replace(address, value, size);
-		cout << "Returning wait time as " << wait_time + wait_time_next_level;
+		// cout << "Returning wait time as " << wait_time + wait_time_next_level;
 		return wait_time + wait_time_next_level;
 	} else {
 		return wait_time;
