@@ -199,7 +199,7 @@ void run_pipeline_real(int cycles, std::string config) {
         pipeline->write_back_instructions[0] = noop;
         pipeline->memory_access_instructions[0] = noop;
         if(previous_file_name == "matrix") 
-            pipeline->last_instruction = 8450;
+            pipeline->last_instruction = 8490;
         else if(previous_file_name == "sort")
             pipeline->last_instruction = 8450; 
         else if(previous_file_name == "loop")
