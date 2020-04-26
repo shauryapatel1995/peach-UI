@@ -308,7 +308,11 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
         // cout << "Tag in fetch is: " << tag << " Index is: " << index << "\n";
         int next_instruction[3]{tag, index, 0};
         int result = 0;
-        pipeline->fetch_wait_time = cache->search(next_instruction, &result);
+        if(pipeline->enable_cache)
+            pipeline->fetch_wait_time = pipeline->cache->search(next_instruction, &result);
+        else 
+            pipeline->fetch_wait_time = pipeline->memory->search(next_instruction, &result);
+
         cout << "Pipeline fetch wait time is: " << pipeline->fetch_wait_time;
         cout << "Result of fetch stage is: " << result << " ";
         
@@ -543,7 +547,11 @@ int memory_access(Pipeline* pipeline) {
             // cout << "Tag in fetch is: " << tag << " Index is: " << index << "\n";
             int memory_address[3]{tag, index, 0};
             cout << "Going to search!\n";
-            pipeline->memory_access_wait_time = pipeline->cache->search(memory_address, &result);
+            if(pipeline->enable_cache)
+                pipeline->memory_access_wait_time = pipeline->cache->search(memory_address, &result);
+            else   
+                pipeline->memory_access_wait_time = pipeline->memory->search(memory_address, &result);
+                
             memory_access_instruction->result = result;
         } else if(memory_access_instruction->instruction_type == 1 && memory_access_instruction->opcode == 2) {
             // Store instruction with data in register

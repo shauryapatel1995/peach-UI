@@ -25,6 +25,8 @@ typedef Instruction Instruction;
 struct Pipeline
 {
     Cache* cache;
+    Memory* memory;
+    int enable_cache; 
     int cache_size;
     int pre_decode_instruction;
     int decode_instruction;

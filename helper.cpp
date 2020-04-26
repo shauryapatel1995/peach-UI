@@ -170,6 +170,7 @@ void run_pipeline_real(int cycles, std::string config) {
     if(pipeline == nullptr) {
         pipeline = new Pipeline();
         pipeline->cache = cache_array;
+        pipeline->memory = mainMem_array;
         pipeline->continue_fetch = 1;
         pipeline->continue_decode = 1;
         pipeline->continue_execute = 1;
@@ -192,14 +193,16 @@ void run_pipeline_real(int cycles, std::string config) {
         if(config == "cp") {
             cout << "Both pipeline and cache working right now!";
             pipeline->single_instruction = 0;
+            pipeline->enable_cache = 1;
         } else if(config == "p") {
             // Disable cache
-            // pipeline->cache = mainMem_array;
+            pipeline->enable_cache = 0;
         } else if(config == "c") {
             // Disable pipeline
             pipeline->single_instruction = 1;
         }  else {
             pipeline->single_instruction = 1;
+            pipeline->enable_cache = 0;
         }
     }
 
