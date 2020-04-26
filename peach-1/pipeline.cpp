@@ -760,7 +760,7 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         decode(pipeline);
 
         
-        if((pipeline->program_counter < 8476 && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0)
+        if((pipeline->program_counter < 8498 && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0)
             fetch(cache_array, sizeCache, pipeline);
         else {
             cout << "Fetch temporarily stopping!";
