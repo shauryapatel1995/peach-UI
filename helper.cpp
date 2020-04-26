@@ -20,7 +20,18 @@ std::string pipelineInfo = "";
 
 int total_cycles;
 
+
 std::string previous_file_name = "";
+
+void reset() {
+    cout << "Resetting values!\n";
+    pipeline = nullptr; 
+    bigDaddy = nullptr; 
+    total_cycles = 0;
+    lilDaddy = nullptr; 
+    previous_file_name = "";
+}
+
 std::string show_file(std::string fileName) {
     std::cout << "File to open is: " << fileName << "\n";
     if(previous_file_name == fileName) {
