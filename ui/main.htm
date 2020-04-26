@@ -53,17 +53,27 @@
         
         <button type="button" id="btn" class="pure-button pure-button-active button-secondary"> Read Memory!</button>
         <button type="button" id="pipe" class="pure-button pure-button-active button-secondary"> Run Pipeline!</button>
+        <button type="button" id="reset" class="pure-button pure-button-active button-secondary"> Reset!</button>
         <input id="numCycles" type="integer">
         Enter number of cycles
         </textarea>
-        <p id="PC">Program Counter:</p>
+        <p id="PC">Program Counter: </p>
+        <p id="total-cycles">Total Cycles: </p>
         <div id="parent_div_2">
         
         <div class="child_div_1">
+            Select Program :
             <select name="fields[Program]" id="program-select">
                 <option value="loop">Loop and count</option>
                 <option value="sort">Sort</option>
                 <option value="matrix">Matrix multiply</option>
+            </select><br/>
+            Select Config: 
+            <select name="fields[Program]" id="config-select">
+            <option value="cp">Enable cache and pipeline</option>
+            <option value="c">Enable cache only</option>
+            <option value="p">Enable pipeline only</option>
+            <option value="ncp">Disable cache and pipeline</option>
             </select>
             <p id="program"></p>
             
@@ -123,6 +133,11 @@
              
             var btn = $(button#btn);
             var pipe = $(button#pipe);
+            var reset = $(button#reset);
+
+            reset.onClick = function() {
+                view.reset_values();
+            };
 
             btn.onClick = function() {
                 var pipeline_header = "<thead>
@@ -134,9 +149,12 @@
                     </tr>
                 </thead>";
                 var program_name = self#program-select.value;
+
+                
                
                 var memory = self#memory;
                 var pc = self#PC;
+                var cycles = self#total-cycles;
                 var pipe = self#pipeinfo;
                 var cache = self#cache;
                 var regs = self#regs;
@@ -147,7 +165,8 @@
                 var regval = "<thead><tr><th>Register</th><th>Value</th></tr></thead>";
                 pc.html = "Program Counter: " + view.getPc();
                 memory.html = memoryval + view.runPipelineUI(50, program_name);
-                
+                cycles.html = "Total Cycles: " + view.total_cycles();
+
                 var pipeline = view.getPipelineInfo();
                 if(pipeline == "")
                     pipe.html = pipeline_header;
@@ -162,9 +181,10 @@
 
             pipe.onClick = function() {
                 var cycles = self#numCycles;
+                var config = self#config-select.value;
                 stdout.println("Running pipeline");
                 stdout.println(cycles.value);
-                view.run_pipeline(cycles.value);
+                view.run_pipeline(cycles.value, config);
             };
     </script>
         

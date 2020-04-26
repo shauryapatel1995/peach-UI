@@ -25,6 +25,8 @@ typedef Instruction Instruction;
 struct Pipeline
 {
     Cache* cache;
+    Memory* memory;
+    int enable_cache; 
     int cache_size;
     int pre_decode_instruction;
     int decode_instruction;
@@ -51,7 +53,7 @@ struct Pipeline
     int write_back_wait_time;
 
     int program_counter = 8427;
-
+    int last_instruction;
     // Set condition register statically for now
     int condition_register = 0;
 
@@ -83,6 +85,12 @@ struct Pipeline
 
     // Flag to indicate data hazard.
     int data_hazard = 0;
+
+    int fetch_stopped;
+    int decode_stopped; 
+    int execute_stopped; 
+    int memory_access_stopped; 
+    int write_back_stopped;
 };
 
 typedef Pipeline Pipeline; 

@@ -273,6 +273,7 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
         // Means NOOP
         if(pipeline->fetch_wait_time == 0) {
             // Push the stored value in this
+            
             if(!pipeline->squash_instructions) {
 
                 pipeline->decode_instructions[0] = pipeline->stored_fetch_result;
@@ -307,7 +308,11 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
         // cout << "Tag in fetch is: " << tag << " Index is: " << index << "\n";
         int next_instruction[3]{tag, index, 0};
         int result = 0;
-        pipeline->fetch_wait_time = cache->search(next_instruction, &result);
+        if(pipeline->enable_cache)
+            pipeline->fetch_wait_time = pipeline->cache->search(next_instruction, &result);
+        else 
+            pipeline->fetch_wait_time = pipeline->memory->search(next_instruction, &result);
+
         cout << "Pipeline fetch wait time is: " << pipeline->fetch_wait_time;
         cout << "Result of fetch stage is: " << result << " ";
         
@@ -324,8 +329,8 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
             pipeline->decode_instructions[0] = result;
             pipeline->program_counter++;
         }
-        if(pipeline->single_instruction)
-            pipeline->continue_fetch = 0;
+        
+            
     } else {
         cout << "Stalled!! ";
     }
@@ -542,7 +547,11 @@ int memory_access(Pipeline* pipeline) {
             // cout << "Tag in fetch is: " << tag << " Index is: " << index << "\n";
             int memory_address[3]{tag, index, 0};
             cout << "Going to search!\n";
-            pipeline->memory_access_wait_time = pipeline->cache->search(memory_address, &result);
+            if(pipeline->enable_cache)
+                pipeline->memory_access_wait_time = pipeline->cache->search(memory_address, &result);
+            else   
+                pipeline->memory_access_wait_time = pipeline->memory->search(memory_address, &result);
+                
             memory_access_instruction->result = result;
         } else if(memory_access_instruction->instruction_type == 1 && memory_access_instruction->opcode == 2) {
             // Store instruction with data in register
@@ -660,7 +669,7 @@ int write_back(Pipeline* pipeline) {
         } else if(pipeline->continue_memory_access == 0) {
             restart_memory_access(pipeline);
         } else {}
-        if(pipeline->single_instruction)
+        if(pipeline->single_instruction && pipeline->continue_decode == 1)
             pipeline->continue_fetch = 1;
 
         // if(write_back_instruction->instruction_type == 1 && write_back_instruction->opcode == 2)
@@ -678,7 +687,7 @@ int write_back(Pipeline* pipeline) {
     return 0;
 }
 
-void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pipeline) {
+int run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pipeline) {
     // pipeline->continue_fetch = 1;
     // pipeline->continue_decode = 1;
     // pipeline->continue_execute = 1;
@@ -705,20 +714,23 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
     // write_back_instructions.push_back(noop);
 
     pipeline->register_bank.insert(pair<int, int>(5,0));
-    while(pipeline->program_counter < 8478 && cycleCount > cycles) {
+    while(cycleCount > cycles) {
         std::cout << "Program counter is: " << pipeline->program_counter;
         // Increment the current cycle 
         pipeline->total_cycles++;
         cout << "Cycle ";
-        
-        if (pipeline->program_counter == 8445) {
-            cout << "DEBUG the core dumped\n";
-        }
 
         if (pipeline->continue_write_back && pipeline->write_back_wait_time == 0)
         {
 
             pipeline->write_back_instruction = pipeline->write_back_instructions[0];
+
+             if(pipeline->write_back_instruction->isNoop && pipeline->memory_access_stopped) {
+                 cout << "STOPPING WRITE BACK!\n";
+                 pipeline->write_back_stopped = 1;
+                 break; 
+             }
+                
             Instruction *noop = new Instruction();
             noop->isNoop = 1;
             pipeline->write_back_instructions[0] = noop;
@@ -730,7 +742,11 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         {
 
             pipeline->memory_access_instruction = pipeline->memory_access_instructions[0];
-            
+             if(pipeline->memory_access_instruction->isNoop && pipeline->execute_stopped) {
+                 pipeline->memory_access_stopped = 1; 
+                 cout << "\nSTOPPING EXECUTE\n";
+             }
+                
             Instruction *noop = new Instruction();
             noop->isNoop = 1;
             pipeline->memory_access_instructions[0] = noop;
@@ -742,7 +758,12 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         {
 
             pipeline->execute_instruction = pipeline->execute_instructions[0];
-            
+            if(pipeline->execute_instruction->isNoop && pipeline->decode_stopped) {
+                pipeline->execute_stopped = 1; 
+                cout << "\nSTOPPING EXECUTE\n";
+            }
+                
+
             Instruction *noop = new Instruction();
             noop->isNoop = 1;
             pipeline->execute_instructions[0] = noop;
@@ -753,6 +774,11 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         if (pipeline->continue_decode && pipeline->decode_wait_time == 0 && !pipeline->data_hazard)
         {
             pipeline->decode_instruction = pipeline->decode_instructions[0];
+            if(pipeline->decode_instruction == -1 && pipeline->fetch_stopped) {
+                pipeline->decode_stopped = 1;
+                cout << "\nSTOPPING DECODE\n";
+            }
+                
             std::cout << "Decode instruction is: " << pipeline->decode_instruction;
             pipeline->decode_instructions[0] = -1;
         }
@@ -760,25 +786,35 @@ void run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* p
         decode(pipeline);
 
         
-        if((pipeline->program_counter < 8498 && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0)
+        if((pipeline->program_counter < pipeline->last_instruction && !pipeline->squash_instructions) || pipeline->fetch_wait_time > 0) {
             fetch(cache_array, sizeCache, pipeline);
-        else {
-            cout << "Fetch temporarily stopping!";
-            cout << "Pipeline squash is?: " << pipeline->squash_instructions;
+           
+            if(pipeline->single_instruction) {
+                pipeline->continue_fetch = 0;
+                cout << "\nStopping fetch because of single instruction!\n";
+            }   
+        } else {
+            cout << "\nSTOPPED FETCH!\n";
+            if(pipeline->program_counter >= pipeline->last_instruction) {
+                pipeline->fetch_stopped = 1;
+                cout << "\nSTOPPING FETCH\n";
+            }
+                
+
         }
         // Here update the pipeline object with the instruction for the next cycle. 
         // We will keep a buffer for each 1 and use the buffer to decide the next object.
 
         // std::this_thread::sleep_for(0.05s);
 
-        cout << "Cache values are: "; 
+        
 
         cycles++;   
     }
     cout << "Cycles taken are: " << pipeline->total_cycles << "\n";
     pipeline->total_cycles = 0;
     
-    return;
+    return cycles;
     
 }
 

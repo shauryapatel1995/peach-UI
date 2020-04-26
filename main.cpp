@@ -7,12 +7,14 @@
 
 
 extern std::string runPipeline(int va11, std::string val2);
-extern void run_pipeline_real(int);
+extern void run_pipeline_real(int, std::string);
 extern std::string getProg();
 extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
 extern std::string show_register_bank_values();
 extern std::string show_file(std::string a);
+extern std::string getTotalCycles();
+extern void reset();
 using namespace sciter;
 
 class frame: public sciter::window, sciter::event_handler {
@@ -24,16 +26,29 @@ public:
   BEGIN_FUNCTION_MAP
     FUNCTION_0("nativeMessage", nativeMessage);
     FUNCTION_0("showCache",showCache);
-    FUNCTION_1("run_pipeline",run_pipeline);
+    FUNCTION_2("run_pipeline",run_pipeline);
     FUNCTION_2("runPipelineUI", runPipelineUI);
     FUNCTION_0("getPc", getPc);
     FUNCTION_0("getPipelineInfo", getPipelineInfo);
     FUNCTION_0("getRegs", getRegs);
     FUNCTION_1("getProgram", getProgram);
+    FUNCTION_0("total_cycles", total_cycles);
+    FUNCTION_0("reset_values", reset_values);
   END_FUNCTION_MAP
   // function expsed to script:
   sciter::string  nativeMessage() { return WSTR("Hello C++ World"); }
 
+  sciter::string reset_values() {
+      reset();
+      return WSTR("Reset all values");
+  }
+
+  sciter::string total_cycles() {
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::wstring_convert<convert_typeX, char16_t> converterX;
+    std::string ans = getTotalCycles();
+    return converterX.from_bytes(ans);
+  }
   
   sciter::string getProgram(sciter::value val) {
     using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
@@ -60,9 +75,13 @@ public:
     
 		return converterX.from_bytes(ans);
   }
-  sciter::string run_pipeline(sciter::value val) {
+  sciter::string run_pipeline(sciter::value val, sciter::value val2) {
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::wstring_convert<convert_typeX, char16_t> converterX;
       int a = val.get(a);
-      run_pipeline_real(a);
+    sciter::string val_string = val2.get((WCHAR *)val_string.c_str());
+    std::string config = converterX.to_bytes(val_string);
+      run_pipeline_real(a, config);
       return WSTR("RAN!");
   } 
   sciter::string getPc() {
