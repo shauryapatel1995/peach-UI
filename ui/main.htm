@@ -54,6 +54,7 @@
         <button type="button" id="btn" class="pure-button pure-button-active button-secondary"> Read Memory</button>
         <button type="button" id="pipe" class="pure-button pure-button-active button-secondary"> Run Pipeline</button>
         <button type="button" id="reset" class="pure-button pure-button-active button-secondary"> Reset</button>
+        <button type="button" id="complete" class="pure-button pure-button-active button-secondary">Run Complete program</button>
         <input id="numCycles" type="integer">
         Enter number of cycles
         </textarea>
@@ -135,10 +136,13 @@
             var btn = $(button#btn);
             var pipe = $(button#pipe);
             var reset = $(button#reset);
-
+            var complete = $(button#complete);
+            
             reset.onClick = function() {
                 view.reset_values();
             };
+            
+            
 
             btn.onClick = function() {
                 var pipeline_header = "<thead>
@@ -186,6 +190,14 @@
                 stdout.println("Running pipeline");
                 stdout.println(cycles.value);
                 view.run_pipeline(cycles.value, config);
+            };
+            
+            complete.onClick = function() {
+                var cycles = self#numCycles;
+                var config = self#config-select.value;
+                stdout.println("Running pipeline");
+                stdout.println(cycles.value);
+                view.run_pipeline_complete(config);
             };
     </script>
         

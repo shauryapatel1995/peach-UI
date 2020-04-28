@@ -7,7 +7,7 @@
 
 
 extern std::string runPipeline(int va11, std::string val2);
-extern void run_pipeline_real(int, std::string);
+extern void run_pipeline_real(int, std::string, int);
 extern std::string getProg();
 extern std::string get_total_pipeline_info();
 extern std::string show_cache_values();
@@ -34,7 +34,9 @@ public:
     FUNCTION_1("getProgram", getProgram);
     FUNCTION_0("total_cycles", total_cycles);
     FUNCTION_0("reset_values", reset_values);
+    FUNCTION_1("run_pipeline_complete", run_pipeline_complete)
   END_FUNCTION_MAP
+
   // function expsed to script:
   sciter::string  nativeMessage() { return WSTR("Hello C++ World"); }
 
@@ -81,9 +83,19 @@ public:
       int a = val.get(a);
     sciter::string val_string = val2.get((WCHAR *)val_string.c_str());
     std::string config = converterX.to_bytes(val_string);
-      run_pipeline_real(a, config);
+      run_pipeline_real(a, config, 0);
       return WSTR("RAN!");
-  } 
+  }
+
+  sciter::string run_pipeline_complete(sciter::value val2)
+  {
+    using convert_typeX = std::codecvt_utf8_utf16<char16_t>;
+    std::wstring_convert<convert_typeX, char16_t> converterX;
+    sciter::string val_string = val2.get((WCHAR *)val_string.c_str());
+    std::string config = converterX.to_bytes(val_string);
+    run_pipeline_real(0, config, 1);
+    return WSTR("RAN!");
+  }
   sciter::string getPc() {
      
       std::string ans = getProg();

@@ -8,6 +8,7 @@
 extern int readMemory(int**, int, std::string);
 extern int run_pipeline(Cache*, int, int, Pipeline*);
 
+typedef std::chrono::high_resolution_clock Clock;
 std::string fileToDisplay;
 
 Pipeline* pipeline = nullptr;
@@ -188,7 +189,7 @@ std::string runPipeline(int val, std::string fileName) {
     return answer;
 }
 
-void run_pipeline_real(int cycles, std::string config) {
+void run_pipeline_real(int cycles, std::string config, int run_to_completion) {
 
     if(pipeline == nullptr) {
         pipeline = new Pipeline();
@@ -236,20 +237,20 @@ void run_pipeline_real(int cycles, std::string config) {
     int result = 0;
    
 	int count = 0;
-    while(count < cycles) {
+    auto t1 = Clock::now();
+    while(count < cycles || run_to_completion) {
         total_cycles += run_pipeline(cache_array, 1024, 1, pipeline);
-        // pipelineInfo += get_pipeline_info();
+        /*pipelineInfo += get_pipeline_info();
         //std::cout << pipelineInfo;
-        // pipelineInformation.push(pipelineInfo); 
+        pipelineInformation.push(pipelineInfo); 
         
-        /*if(pipelineInformation.size() > 100)
+        if(pipelineInformation.size() > 20)
             pipelineInformation.pop(); */
         
         if(pipeline->write_back_stopped)
             return;
         count++;
     }
-
-    cout << "Cycles completed " << count << "\n"; 
-    
+    auto t2 = Clock::now();
+    cout << "Time taken to run " << chrono::duration_cast<chrono::seconds>(t2 - t1).count() << "\n";
 }
