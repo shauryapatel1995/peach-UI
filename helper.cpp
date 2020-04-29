@@ -17,8 +17,10 @@ std::queue<std::string> pipelineInformation;
 
 int **bigDaddy = nullptr;
 int **lilDaddy = nullptr;
+int **pipelinecache = nullptr;
 MainMemory * mainMem_array = nullptr;
 Cache * cache_array;
+Cache * pipeline_array; 
 
 std::string pipelineInfo = "";
 
@@ -33,6 +35,7 @@ void reset() {
     bigDaddy = nullptr; 
     total_cycles = 0;
     lilDaddy = nullptr; 
+    pipelinecache = nullptr;
     previous_file_name = "";
 }
 
@@ -175,9 +178,27 @@ std::string runPipeline(int val, std::string fileName) {
 				lilDaddy[j][k] = -1;
 			}	
 		}
-	}
-     mainMem_array = new MainMemory(bigDaddy, nullptr, lilDaddy, 10, "main", sizeMain);
+    }
+        pipelinecache = new int*[sizeCache];
+        for (int j = 0; j < sizeCache; j++){
+		pipelinecache[j] = new int[3];
+		
+        for(int k = 0; k < 3; k++)
+		{
+			if (k == 1){
+				// converts decimal to a binary string
+				pipelinecache[j][k] = j;
+			}
+			else {	
+				pipelinecache[j][k] = -1;
+			}	
+		}
+	
+    }
+
+     mainMem_array = new MainMemory(bigDaddy, nullptr, lilDaddy, 100, "main", sizeMain);
 	 cache_array = new Cache(lilDaddy,mainMem_array, bigDaddy, 1, "cache", sizeCache);
+     pipeline_array = new Cache(pipelinecache, mainMem_array, bigDaddy, 1,"pipeline-cache", sizeCache);
 
   } else {
             
@@ -195,13 +216,16 @@ void run_pipeline_real(int cycles, std::string config, int run_to_completion) {
         pipeline = new Pipeline();
         pipeline->cache = cache_array;
         pipeline->memory = mainMem_array;
+        pipeline->instruction_cache = pipeline_array;
         pipeline->continue_fetch = 1;
         pipeline->continue_decode = 1;
         pipeline->continue_execute = 1;
         pipeline->continue_memory_access = 1;
         pipeline->continue_write_back = 1;
+        
         Instruction* noop = new Instruction();
         noop->isNoop = 1;
+
         pipeline->execute_instructions[0] = noop;
         pipeline->write_back_instructions[0] = noop;
         pipeline->memory_access_instructions[0] = noop;
@@ -229,6 +253,8 @@ void run_pipeline_real(int cycles, std::string config, int run_to_completion) {
             pipeline->single_instruction = 1;
             pipeline->enable_cache = 0;
         }
+        pipeline->noop = new Instruction();
+        pipeline->noop->isNoop = 1;
         
     }
 
@@ -240,6 +266,7 @@ void run_pipeline_real(int cycles, std::string config, int run_to_completion) {
     auto t1 = Clock::now();
     while(count < cycles || run_to_completion) {
         total_cycles += run_pipeline(cache_array, 1024, 1, pipeline);
+        
         /*pipelineInfo += get_pipeline_info();
         //std::cout << pipelineInfo;
         pipelineInformation.push(pipelineInfo); 
@@ -247,10 +274,12 @@ void run_pipeline_real(int cycles, std::string config, int run_to_completion) {
         if(pipelineInformation.size() > 20)
             pipelineInformation.pop(); */
         
-        if(pipeline->write_back_stopped)
+        if(pipeline->write_back_stopped) {
+             auto t2 = Clock::now();
+            cout << "Time taken to run " << chrono::duration_cast<chrono::seconds>(t2 - t1).count() << "\n";
             return;
+        }
+            
         count++;
     }
-    auto t2 = Clock::now();
-    cout << "Time taken to run " << chrono::duration_cast<chrono::seconds>(t2 - t1).count() << "\n";
 }

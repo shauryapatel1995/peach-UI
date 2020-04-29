@@ -396,7 +396,7 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
         int next_instruction[3]{tag, index, 0};
         int result = 0;
         if(pipeline->enable_cache)
-            pipeline->fetch_wait_time = pipeline->cache->search(next_instruction, &result);
+            pipeline->fetch_wait_time = pipeline->instruction_cache->search(next_instruction, &result);
         else 
             pipeline->fetch_wait_time = pipeline->memory->search(next_instruction, &result);
 
@@ -417,7 +417,7 @@ int fetch(Cache* cache, int cache_size, Pipeline* pipeline) {
             pipeline->program_counter++;
         }
         
-            
+        delete address;  
     } else {
         // cout << "Stalled!! ";
     }
@@ -480,8 +480,9 @@ int decode(Pipeline* pipeline) {
             return 0;
         // cout << "Instruction type is: " << instruction->instruction_type << " Opcode is: " << instruction->opcode << "\n";
         // cout << "Addressing mode is: " << instruction->addressing_mode << " Immediate bit is: " << instruction->immediate << "\n";
-
+      
         pipeline->execute_instructions[0] =  instruction;
+
         delete binary_instruction;
     } else {
         // cout << "Stalled!! ";
@@ -515,7 +516,9 @@ int execute(Pipeline* pipeline){
         {
             // cout << "NOOP ";
             execute_instruction->isNoop = 1;
-            pipeline->memory_access_instructions[0] = execute_instruction;
+            // pipeline->memory_access_instructions[0] = execute_instruction;
+            pipeline->memory_access_instructions[0] = pipeline->noop;
+            
             return 0;
         }
 
@@ -582,6 +585,7 @@ int execute(Pipeline* pipeline){
             restart_decode(pipeline);
         }
         else {}
+        
         pipeline->memory_access_instructions[0] = execute_instruction;
     } else {
         // cout << "Stalled!! ";
@@ -600,9 +604,10 @@ int memory_access(Pipeline* pipeline) {
     
     if(pipeline->memory_access_wait_time != 0) {
         // cout << "Executing ";
-        Instruction* noop = new Instruction();
-        noop->isNoop = 1;
-        pipeline->write_back_instructions[0] = noop;
+        // Instruction* noop = new Instruction();
+        // noop->isNoop = 1;
+       
+        pipeline->write_back_instructions[0] = pipeline->noop;
         pipeline->memory_access_wait_time--;
         // cout << "Reducing the time: " << pipeline->memory_access_wait_time << " ";
         if(pipeline->memory_access_wait_time == 0) {
@@ -617,7 +622,10 @@ int memory_access(Pipeline* pipeline) {
         // Next instruction should be stored for now
         Instruction *memory_access_instruction = pipeline->memory_access_instruction;
         if(memory_access_instruction->isNoop) {
-            pipeline->write_back_instructions[0] = memory_access_instruction;
+           
+            
+            //pipeline->write_back_instructions[0] = memory_access_instruction;
+            pipeline->write_back_instructions[0] = pipeline->noop;
             // cout << "NOOP ";
             return 1;
         }
@@ -642,6 +650,7 @@ int memory_access(Pipeline* pipeline) {
                 pipeline->memory_access_wait_time = pipeline->memory->search(memory_address, &result);
                 
             memory_access_instruction->result = result;
+            delete address;
         } else if(memory_access_instruction->instruction_type == 1 && memory_access_instruction->opcode == 2) {
             // Store instruction with data in register
             // cout << "Storing to memory!" << std::endl;
@@ -655,6 +664,7 @@ int memory_access(Pipeline* pipeline) {
             // cout << "Going to write ";
             // cout << "Writing to tag " << tag << " " << index << " " << memory_access_instruction->result << " ";
             pipeline->memory_access_wait_time = pipeline->cache->write(memory_address, memory_access_instruction->result);
+            delete address;
         } else {}
         
         
@@ -669,10 +679,14 @@ int memory_access(Pipeline* pipeline) {
             pipeline->continue_decode = 0;
             pipeline->continue_execute = 0;
             pipeline->continue_memory_access = 0;
+            
+            // Instruction* noop = new Instruction();
+            // noop->isNoop = 1;
             pipeline->write_back_instructions[0] = pipeline->noop;
         } else if(pipeline->continue_execute == 0) {
             restart_memory_access(pipeline);
         } else {
+           
             pipeline->write_back_instructions[0] = memory_access_instruction;
         }
         
@@ -700,7 +714,7 @@ int write_back(Pipeline* pipeline) {
     } else if(pipeline->continue_write_back) {
         if(pipeline->write_back_instruction->isNoop) {
             // cout << "NOOP ";
-            return 0;
+           return 0;
         }
         Instruction *write_back_instruction = pipeline->write_back_instruction;
 
@@ -768,7 +782,8 @@ int write_back(Pipeline* pipeline) {
         if(pipeline->data_hazard == 1 && pipeline->continue_memory_access == 1 && pipeline->continue_execute == 1)
             restart_decode(pipeline);
         
-        delete write_back_instruction;
+        delete pipeline->write_back_instruction;
+        
     } else {
         // cout << "Stalled\n";
     }
@@ -800,7 +815,8 @@ int run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pi
 
     //  write_back_instructions.push_back(noop);
     // write_back_instructions.push_back(noop);
-
+    
+    
     pipeline->register_bank.insert(pair<int, int>(5,0));
     while(cycleCount > cycles) {
         // std::cout << "Program counter is: " << pipeline->program_counter;
@@ -812,52 +828,72 @@ int run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pi
         {
 
             pipeline->write_back_instruction = pipeline->write_back_instructions[0];
+            
+            if(pipeline->write_back_instruction == nullptr) {
+                // Create new noop
+                // Instruction* noop = new Instruction(); 
+                // noop->isNoop = 1;
+                pipeline->write_back_instruction = pipeline->noop;
+            }
 
              if(pipeline->write_back_instruction->isNoop && pipeline->memory_access_stopped) {
                  // cout << "STOPPING WRITE BACK!\n";
                  pipeline->write_back_stopped = 1;
                  break; 
              }
-                
-            Instruction *noop = new Instruction();
-            noop->isNoop = 1;
-            pipeline->write_back_instructions[0] = noop;
+           
+            pipeline->write_back_instructions[0] = nullptr;
         }
         
         write_back(pipeline);
+        
+            
 
         if (pipeline->continue_memory_access && pipeline->memory_access_wait_time == 0)
         {
 
             pipeline->memory_access_instruction = pipeline->memory_access_instructions[0];
+
+            if(pipeline->memory_access_instruction == nullptr) {
+                 // Create new noop
+                // Instruction* noop = new Instruction(); 
+                // noop->isNoop = 1;
+                pipeline->memory_access_instruction = pipeline->noop;
+            }
+
              if(pipeline->memory_access_instruction->isNoop && pipeline->execute_stopped) {
                  pipeline->memory_access_stopped = 1; 
                  // cout << "\nSTOPPING EXECUTE\n";
              }
-                
-            Instruction *noop = new Instruction();
-            noop->isNoop = 1;
-            pipeline->memory_access_instructions[0] = noop;
+            
+             pipeline->memory_access_instructions[0] = nullptr;
         }
 
         memory_access(pipeline);
+        
 
         if (pipeline->continue_execute && pipeline->execute_wait_time == 0)
         {
 
             pipeline->execute_instruction = pipeline->execute_instructions[0];
+
+            if(pipeline->execute_instruction == nullptr) {
+                 // Create new noop
+                // Instruction* noop = new Instruction(); 
+                // noop->isNoop = 1;
+                pipeline->execute_instruction = pipeline->noop;
+            }
+
             if(pipeline->execute_instruction->isNoop && pipeline->decode_stopped) {
                 pipeline->execute_stopped = 1; 
                 // cout << "\nSTOPPING EXECUTE\n";
             }
                 
-
-            Instruction *noop = new Instruction();
-            noop->isNoop = 1;
-            pipeline->execute_instructions[0] = noop;
+            pipeline->execute_instructions[0] = nullptr;
         }
 
         execute(pipeline);
+        
 
         if (pipeline->continue_decode && pipeline->decode_wait_time == 0 && !pipeline->data_hazard)
         {
@@ -894,9 +930,7 @@ int run_pipeline(Cache* cache_array, int sizeCache, int cycleCount, Pipeline* pi
         // We will keep a buffer for each 1 and use the buffer to decide the next object.
 
         // std::this_thread::sleep_for(0.05s);
-
         
-
         cycles++;   
     }
     // cout << "Cycles taken are: " << pipeline->total_cycles << "\n";

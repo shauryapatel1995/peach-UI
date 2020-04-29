@@ -25,6 +25,7 @@ typedef Instruction Instruction;
 struct Pipeline
 {
     Cache* cache;
+    Cache* instruction_cache;
     Memory* memory;
     int enable_cache; 
     int cache_size;
@@ -36,6 +37,7 @@ struct Pipeline
     Instruction *memory_access_instruction;
     Instruction *write_back_instruction;
 
+    Instruction *noop;
     // Booleans to control the stages
     int continue_fetch;
     int continue_decode;
@@ -68,11 +70,11 @@ struct Pipeline
 
     int decode_instructions[1] = {-1};
 
-    Instruction *noop = new Instruction();
     
-    Instruction *execute_instructions[1] = {noop};
-    Instruction *memory_access_instructions[1] = {noop};
-    Instruction *write_back_instructions[1] = {noop};
+    
+    Instruction *execute_instructions[1];
+    Instruction *memory_access_instructions[1];
+    Instruction *write_back_instructions[1];
 
     bool write_back_completed = false;
     int squash_instructions = 0;
