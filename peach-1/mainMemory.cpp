@@ -92,7 +92,7 @@ int Cache::search(int address[], int* result) {
 		// cout << "Going to the next level!\n";
 		int wait_time_next_level = next_level->search(address, result);
 		int value = *result;
-		Memory::replace(address, value, size);
+		this->replace(address, value, this->size);
 		// cout << "Returning wait time as " << wait_time + wait_time_next_level;
 		return wait_time + wait_time_next_level;
 	} else {

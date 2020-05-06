@@ -68,7 +68,7 @@ std::string getTotalCycles() {
 std::string show_cache_values() {
     std::basic_string<char> answer = "";
     std::basic_string<char> br  = "<br/>";
-        for(int i = 0; i <= 10; i++)
+        for(int i = 200; i <= 300; i++)
             answer += "<tr><td>" + std::to_string(lilDaddy[i][0]) + "</td><td>" + std::to_string(lilDaddy[i][1]) + "</td><td> " + std::to_string(lilDaddy[i][2]) + "</td></tr>";
 
         std::cout << "Cache returned ";
@@ -101,12 +101,20 @@ std::string getProg() {
 }
 
 std::string get_total_pipeline_info() {
-    std::string ans = "";
-    while(!pipelineInformation.empty()) {
-        ans += pipelineInformation.front();
-        pipelineInformation.pop();
-    }
-    return ans;
+    // std::string ans = "";
+    // while(!pipelineInformation.empty()) {
+    //     ans += pipelineInformation.front();
+    //     pipelineInformation.pop();
+    // }
+    // return ans;
+    std::basic_string<char> answer = "";
+    std::basic_string<char> br = "<br/>";
+    for (int i = 200; i <= 300; i++)
+        answer += "<tr><td>" + std::to_string(pipelinecache[i][0]) + "</td><td>" + std::to_string(pipelinecache[i][1]) + "</td><td> " + std::to_string(pipelinecache[i][2]) + "</td></tr>";
+
+    std::cout << "Cache returned ";
+
+    return answer;
 }
 
 std::string get_pipeline_info() {
